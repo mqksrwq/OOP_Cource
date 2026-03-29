@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using OOP_Cource.Forms;
 
 namespace OOP_Cource
 {
@@ -15,6 +9,18 @@ namespace OOP_Cource
         public Form1()
         {
             InitializeComponent();
+        }
+
+        private void btnNext_Click(object sender, EventArgs e)
+        {
+            Hide();
+
+            using (var mainForm = new MainForm())
+            {
+                mainForm.ShowDialog();
+            }
+
+            Close();
         }
     }
 }
