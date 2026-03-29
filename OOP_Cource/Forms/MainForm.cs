@@ -50,7 +50,6 @@ namespace OOP_Cource.Forms
         public MainForm()
         {
             InitializeMainForm();
-            SeedData();
             RefreshVehicleSelectors();
         }
 
@@ -58,7 +57,9 @@ namespace OOP_Cource.Forms
         {
             Text = "Учет автобусного парка";
             StartPosition = FormStartPosition.CenterScreen;
-            WindowState = FormWindowState.Maximized;
+            WindowState = FormWindowState.Normal;
+            Size = new Size(980, 680);
+            MinimumSize = new Size(980, 680);
 
             var tabControl = new TabControl { Dock = DockStyle.Fill };
             tabControl.TabPages.Add(CreateVehiclesTab());
@@ -86,20 +87,18 @@ namespace OOP_Cource.Forms
             var btnAdd = new Button { Text = "Добавить транспорт", AutoSize = true };
             btnAdd.Click += BtnAddVehicle_Click;
 
-            inputPanel.Controls.AddRange(new Control[]
-            {
-                new Label { Text = "Гос. номер", AutoSize = true, Padding = new Padding(0, 9, 0, 0) }, txtVehicleNumber,
-                new Label { Text = "Модель", AutoSize = true, Padding = new Padding(10, 9, 0, 0) }, txtVehicleModel,
-                new Label { Text = "Вместимость", AutoSize = true, Padding = new Padding(10, 9, 0, 0) }, txtVehicleCapacity,
-                new Label { Text = "Статус", AutoSize = true, Padding = new Padding(10, 9, 0, 0) }, cmbVehicleStatus,
-                btnAdd
-            });
+            inputPanel.Controls.Add(CreateInputRow("Гос. номер", txtVehicleNumber));
+            inputPanel.Controls.Add(CreateInputRow("Модель", txtVehicleModel));
+            inputPanel.Controls.Add(CreateInputRow("Вместимость", txtVehicleCapacity));
+            inputPanel.Controls.Add(CreateInputRow("Статус", cmbVehicleStatus));
+            inputPanel.Controls.Add(CreateButtonRow(btnAdd));
 
             var grid = CreateGrid();
             grid.DataSource = _vehicles;
 
             split.Panel1.Controls.Add(inputPanel);
-            split.Panel2.Controls.Add(grid);
+            split.Panel2.Controls.Add(CreateDynamicGridHost(grid));
+            ConfigureSplitLayout(split, inputPanel, 220);
             return page;
         }
 
@@ -118,21 +117,19 @@ namespace OOP_Cource.Forms
             var btnAdd = new Button { Text = "Добавить маршрут", AutoSize = true };
             btnAdd.Click += BtnAddRoute_Click;
 
-            inputPanel.Controls.AddRange(new Control[]
-            {
-                new Label { Text = "Код", AutoSize = true, Padding = new Padding(0, 9, 0, 0) }, txtRouteCode,
-                new Label { Text = "Откуда", AutoSize = true, Padding = new Padding(10, 9, 0, 0) }, txtRouteFrom,
-                new Label { Text = "Куда", AutoSize = true, Padding = new Padding(10, 9, 0, 0) }, txtRouteTo,
-                new Label { Text = "Дистанция, км", AutoSize = true, Padding = new Padding(10, 9, 0, 0) }, txtRouteDistance,
-                new Label { Text = "Тариф", AutoSize = true, Padding = new Padding(10, 9, 0, 0) }, txtRouteFare,
-                btnAdd
-            });
+            inputPanel.Controls.Add(CreateInputRow("Код", txtRouteCode));
+            inputPanel.Controls.Add(CreateInputRow("Откуда", txtRouteFrom));
+            inputPanel.Controls.Add(CreateInputRow("Куда", txtRouteTo));
+            inputPanel.Controls.Add(CreateInputRow("Дистанция, км", txtRouteDistance));
+            inputPanel.Controls.Add(CreateInputRow("Тариф", txtRouteFare));
+            inputPanel.Controls.Add(CreateButtonRow(btnAdd));
 
             var grid = CreateGrid();
             grid.DataSource = _routes;
 
             split.Panel1.Controls.Add(inputPanel);
-            split.Panel2.Controls.Add(grid);
+            split.Panel2.Controls.Add(CreateDynamicGridHost(grid));
+            ConfigureSplitLayout(split, inputPanel, 250);
             return page;
         }
 
@@ -149,19 +146,17 @@ namespace OOP_Cource.Forms
             var btnAdd = new Button { Text = "Добавить водителя", AutoSize = true };
             btnAdd.Click += BtnAddDriver_Click;
 
-            inputPanel.Controls.AddRange(new Control[]
-            {
-                new Label { Text = "ФИО", AutoSize = true, Padding = new Padding(0, 9, 0, 0) }, txtDriverName,
-                new Label { Text = "Номер прав", AutoSize = true, Padding = new Padding(10, 9, 0, 0) }, txtDriverLicense,
-                new Label { Text = "Транспорт", AutoSize = true, Padding = new Padding(10, 9, 0, 0) }, cmbDriverVehicle,
-                btnAdd
-            });
+            inputPanel.Controls.Add(CreateInputRow("ФИО", txtDriverName));
+            inputPanel.Controls.Add(CreateInputRow("Номер прав", txtDriverLicense));
+            inputPanel.Controls.Add(CreateInputRow("Транспорт", cmbDriverVehicle));
+            inputPanel.Controls.Add(CreateButtonRow(btnAdd));
 
             var grid = CreateGrid();
             grid.DataSource = _drivers;
 
             split.Panel1.Controls.Add(inputPanel);
-            split.Panel2.Controls.Add(grid);
+            split.Panel2.Controls.Add(CreateDynamicGridHost(grid));
+            ConfigureSplitLayout(split, inputPanel, 190);
             return page;
         }
 
@@ -182,28 +177,26 @@ namespace OOP_Cource.Forms
             var btnAdd = new Button { Text = "Добавить операцию", AutoSize = true };
             btnAdd.Click += BtnAddOperation_Click;
 
-            inputPanel.Controls.AddRange(new Control[]
-            {
-                new Label { Text = "Дата", AutoSize = true, Padding = new Padding(0, 9, 0, 0) }, dtOperationDate,
-                new Label { Text = "Тип", AutoSize = true, Padding = new Padding(10, 9, 0, 0) }, cmbOperationType,
-                new Label { Text = "Категория", AutoSize = true, Padding = new Padding(10, 9, 0, 0) }, txtOperationCategory,
-                new Label { Text = "Сумма", AutoSize = true, Padding = new Padding(10, 9, 0, 0) }, txtOperationAmount,
-                new Label { Text = "Комментарий", AutoSize = true, Padding = new Padding(10, 9, 0, 0) }, txtOperationComment,
-                btnAdd
-            });
+            inputPanel.Controls.Add(CreateInputRow("Дата", dtOperationDate));
+            inputPanel.Controls.Add(CreateInputRow("Тип", cmbOperationType));
+            inputPanel.Controls.Add(CreateInputRow("Категория", txtOperationCategory));
+            inputPanel.Controls.Add(CreateInputRow("Сумма", txtOperationAmount));
+            inputPanel.Controls.Add(CreateInputRow("Комментарий", txtOperationComment));
+            inputPanel.Controls.Add(CreateButtonRow(btnAdd));
 
             var grid = CreateGrid();
             grid.DataSource = _operations;
 
             split.Panel1.Controls.Add(inputPanel);
-            split.Panel2.Controls.Add(grid);
+            split.Panel2.Controls.Add(CreateDynamicGridHost(grid));
+            ConfigureSplitLayout(split, inputPanel, 250);
             return page;
         }
 
         private TabPage CreateReportsTab()
         {
             var page = new TabPage("Отчеты");
-            var split = CreateSplitContainer(page, 80);
+            var split = CreateSplitContainer(page, 140);
             var inputPanel = CreateFlowPanel();
 
             dtReportFrom = new DateTimePicker { Width = 120, Format = DateTimePickerFormat.Short, Value = DateTime.Today.AddMonths(-1) };
@@ -215,13 +208,10 @@ namespace OOP_Cource.Forms
             var btnCategory = new Button { Text = "По категориям", AutoSize = true };
             btnCategory.Click += BtnCategoryReport_Click;
 
-            inputPanel.Controls.AddRange(new Control[]
-            {
-                new Label { Text = "Период с", AutoSize = true, Padding = new Padding(0, 9, 0, 0) }, dtReportFrom,
-                new Label { Text = "по", AutoSize = true, Padding = new Padding(10, 9, 0, 0) }, dtReportTo,
-                btnSummary,
-                btnCategory
-            });
+            inputPanel.Controls.Add(CreateInputRow("Период с", dtReportFrom));
+            inputPanel.Controls.Add(CreateInputRow("Период по", dtReportTo));
+            inputPanel.Controls.Add(CreateButtonRow(btnSummary));
+            inputPanel.Controls.Add(CreateButtonRow(btnCategory));
 
             txtReport = new TextBox
             {
@@ -234,18 +224,18 @@ namespace OOP_Cource.Forms
 
             split.Panel1.Controls.Add(inputPanel);
             split.Panel2.Controls.Add(txtReport);
+            ConfigureSplitLayout(split, inputPanel, 170);
             return page;
         }
 
-        private static SplitContainer CreateSplitContainer(TabPage page, int panel1Height = 120)
+        private static SplitContainer CreateSplitContainer(TabPage page, int panel1Height = 250)
         {
             var split = new SplitContainer
             {
                 Dock = DockStyle.Fill,
                 Orientation = Orientation.Horizontal,
-                IsSplitterFixed = true,
-                FixedPanel = FixedPanel.Panel1,
-                SplitterDistance = panel1Height
+                IsSplitterFixed = false,
+                FixedPanel = FixedPanel.None
             };
 
             page.Controls.Add(split);
@@ -259,8 +249,47 @@ namespace OOP_Cource.Forms
                 Dock = DockStyle.Fill,
                 AutoScroll = true,
                 Padding = new Padding(10),
-                WrapContents = true
+                FlowDirection = FlowDirection.TopDown,
+                WrapContents = false
             };
+        }
+
+        private static Panel CreateInputRow(string labelText, Control control)
+        {
+            var row = new Panel
+            {
+                Width = 500,
+                Height = 36,
+                Margin = new Padding(0, 0, 0, 6)
+            };
+
+            var label = new Label
+            {
+                Text = labelText,
+                Width = 140,
+                Height = 24,
+                Location = new Point(0, 7),
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+
+            control.Location = new Point(150, 4);
+            row.Controls.Add(label);
+            row.Controls.Add(control);
+            return row;
+        }
+
+        private static Panel CreateButtonRow(Button button)
+        {
+            var row = new Panel
+            {
+                Width = 500,
+                Height = 38,
+                Margin = new Padding(0, 4, 0, 0)
+            };
+
+            button.Location = new Point(150, 4);
+            row.Controls.Add(button);
+            return row;
         }
 
         private static TextBox CreateTextBox(int width)
@@ -272,13 +301,76 @@ namespace OOP_Cource.Forms
         {
             return new DataGridView
             {
-                Dock = DockStyle.Fill,
+                Dock = DockStyle.Top,
                 ReadOnly = true,
                 AutoGenerateColumns = true,
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
-                SelectionMode = DataGridViewSelectionMode.FullRowSelect
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+                BackgroundColor = Color.White,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
             };
+        }
+
+        private static void ConfigureSplitLayout(SplitContainer split, FlowLayoutPanel inputPanel, int minHeight)
+        {
+            Action applyLayout = () =>
+            {
+                var minTop = 140;
+                var minBottom = 180;
+                var available = split.ClientSize.Height - split.SplitterWidth;
+
+                if (available <= 0)
+                {
+                    return;
+                }
+
+                if (available < minTop + minBottom)
+                {
+                    split.SplitterDistance = Math.Max(1, available / 2);
+                    return;
+                }
+
+                var desired = Math.Max(minHeight, inputPanel.PreferredSize.Height + 14);
+                var clamped = Math.Max(minTop, Math.Min(desired, available - minBottom));
+                split.SplitterDistance = clamped;
+            };
+
+            split.SizeChanged += (sender, args) => applyLayout();
+            inputPanel.SizeChanged += (sender, args) => applyLayout();
+            applyLayout();
+        }
+
+        private static Panel CreateDynamicGridHost(DataGridView grid)
+        {
+            var host = new Panel
+            {
+                Dock = DockStyle.Fill,
+                AutoScroll = true,
+                BackColor = Color.White
+            };
+
+            Action resizeGrid = () =>
+            {
+                var rowsHeight = 0;
+                for (var i = 0; i < grid.Rows.Count; i++)
+                {
+                    rowsHeight += grid.Rows[i].Height;
+                }
+
+                var requiredHeight = grid.ColumnHeadersHeight + rowsHeight + 2;
+                var maxHeight = Math.Max(140, host.ClientSize.Height - 2);
+                grid.Height = Math.Min(requiredHeight, maxHeight);
+            };
+
+            host.Resize += (sender, args) => resizeGrid();
+            grid.RowsAdded += (sender, args) => resizeGrid();
+            grid.RowsRemoved += (sender, args) => resizeGrid();
+            grid.DataBindingComplete += (sender, args) => resizeGrid();
+
+            host.Controls.Add(grid);
+            resizeGrid();
+            return host;
         }
 
         private void BtnAddVehicle_Click(object sender, EventArgs e)
@@ -463,35 +555,5 @@ namespace OOP_Cource.Forms
             cmbDriverVehicle.ValueMember = "Id";
         }
 
-        private void SeedData()
-        {
-            _vehicles.Add(new Vehicle { Id = _vehicleId++, Number = "А123ВС", Model = "ЛиАЗ-5292", Capacity = 95, Status = "Исправен" });
-            _vehicles.Add(new Vehicle { Id = _vehicleId++, Number = "В456ОР", Model = "ПАЗ-3204", Capacity = 52, Status = "Резерв" });
-
-            _routes.Add(new Route { Id = _routeId++, Code = "№12", StartPoint = "Центр", EndPoint = "Вокзал", DistanceKm = 14, Fare = 45 });
-            _routes.Add(new Route { Id = _routeId++, Code = "№21", StartPoint = "Парк", EndPoint = "Университет", DistanceKm = 11, Fare = 40 });
-
-            _drivers.Add(new Driver { Id = _driverId++, FullName = "Иванов И.И.", LicenseNumber = "77 00 123456", AssignedVehicle = "А123ВС - ЛиАЗ-5292" });
-
-            _operations.Add(new FinanceOperation
-            {
-                Id = _operationId++,
-                Date = DateTime.Today,
-                Type = "Доход",
-                Category = "Оплата за проезд",
-                Amount = 35000,
-                Comment = "Смена 1"
-            });
-
-            _operations.Add(new FinanceOperation
-            {
-                Id = _operationId++,
-                Date = DateTime.Today,
-                Type = "Расход",
-                Category = "Ремонт",
-                Amount = 8500,
-                Comment = "Замена тормозных колодок"
-            });
-        }
     }
 }
