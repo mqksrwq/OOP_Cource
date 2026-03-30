@@ -47,6 +47,11 @@ namespace OOP_Cource.Forms
         private DateTimePicker dtReportTo;
         private TextBox txtReport;
 
+        private DataGridView dgvVehicles;
+        private DataGridView dgvRoutes;
+        private DataGridView dgvDrivers;
+        private DataGridView dgvOperations;
+
         public MainForm()
         {
             InitializeMainForm();
@@ -86,18 +91,21 @@ namespace OOP_Cource.Forms
 
             var btnAdd = new Button { Text = "Добавить транспорт", AutoSize = true };
             btnAdd.Click += BtnAddVehicle_Click;
+            var btnDelete = new Button { Text = "Удалить выбранный", AutoSize = true };
+            btnDelete.Click += BtnDeleteVehicle_Click;
 
             inputPanel.Controls.Add(CreateInputRow("Гос. номер", txtVehicleNumber));
             inputPanel.Controls.Add(CreateInputRow("Модель", txtVehicleModel));
             inputPanel.Controls.Add(CreateInputRow("Вместимость", txtVehicleCapacity));
             inputPanel.Controls.Add(CreateInputRow("Статус", cmbVehicleStatus));
             inputPanel.Controls.Add(CreateButtonRow(btnAdd));
+            inputPanel.Controls.Add(CreateButtonRow(btnDelete));
 
-            var grid = CreateGrid();
-            grid.DataSource = _vehicles;
+            dgvVehicles = CreateGrid();
+            dgvVehicles.DataSource = _vehicles;
 
             split.Panel1.Controls.Add(inputPanel);
-            split.Panel2.Controls.Add(CreateDynamicGridHost(grid));
+            split.Panel2.Controls.Add(CreateDynamicGridHost(dgvVehicles));
             ConfigureSplitLayout(split, inputPanel, 220);
             return page;
         }
@@ -116,6 +124,8 @@ namespace OOP_Cource.Forms
 
             var btnAdd = new Button { Text = "Добавить маршрут", AutoSize = true };
             btnAdd.Click += BtnAddRoute_Click;
+            var btnDelete = new Button { Text = "Удалить выбранный", AutoSize = true };
+            btnDelete.Click += BtnDeleteRoute_Click;
 
             inputPanel.Controls.Add(CreateInputRow("Код", txtRouteCode));
             inputPanel.Controls.Add(CreateInputRow("Откуда", txtRouteFrom));
@@ -123,12 +133,13 @@ namespace OOP_Cource.Forms
             inputPanel.Controls.Add(CreateInputRow("Дистанция, км", txtRouteDistance));
             inputPanel.Controls.Add(CreateInputRow("Тариф", txtRouteFare));
             inputPanel.Controls.Add(CreateButtonRow(btnAdd));
+            inputPanel.Controls.Add(CreateButtonRow(btnDelete));
 
-            var grid = CreateGrid();
-            grid.DataSource = _routes;
+            dgvRoutes = CreateGrid();
+            dgvRoutes.DataSource = _routes;
 
             split.Panel1.Controls.Add(inputPanel);
-            split.Panel2.Controls.Add(CreateDynamicGridHost(grid));
+            split.Panel2.Controls.Add(CreateDynamicGridHost(dgvRoutes));
             ConfigureSplitLayout(split, inputPanel, 250);
             return page;
         }
@@ -145,17 +156,20 @@ namespace OOP_Cource.Forms
 
             var btnAdd = new Button { Text = "Добавить водителя", AutoSize = true };
             btnAdd.Click += BtnAddDriver_Click;
+            var btnDelete = new Button { Text = "Удалить выбранного", AutoSize = true };
+            btnDelete.Click += BtnDeleteDriver_Click;
 
             inputPanel.Controls.Add(CreateInputRow("ФИО", txtDriverName));
             inputPanel.Controls.Add(CreateInputRow("Номер прав", txtDriverLicense));
             inputPanel.Controls.Add(CreateInputRow("Транспорт", cmbDriverVehicle));
             inputPanel.Controls.Add(CreateButtonRow(btnAdd));
+            inputPanel.Controls.Add(CreateButtonRow(btnDelete));
 
-            var grid = CreateGrid();
-            grid.DataSource = _drivers;
+            dgvDrivers = CreateGrid();
+            dgvDrivers.DataSource = _drivers;
 
             split.Panel1.Controls.Add(inputPanel);
-            split.Panel2.Controls.Add(CreateDynamicGridHost(grid));
+            split.Panel2.Controls.Add(CreateDynamicGridHost(dgvDrivers));
             ConfigureSplitLayout(split, inputPanel, 190);
             return page;
         }
@@ -176,6 +190,8 @@ namespace OOP_Cource.Forms
 
             var btnAdd = new Button { Text = "Добавить операцию", AutoSize = true };
             btnAdd.Click += BtnAddOperation_Click;
+            var btnDelete = new Button { Text = "Удалить выбранную", AutoSize = true };
+            btnDelete.Click += BtnDeleteOperation_Click;
 
             inputPanel.Controls.Add(CreateInputRow("Дата", dtOperationDate));
             inputPanel.Controls.Add(CreateInputRow("Тип", cmbOperationType));
@@ -183,12 +199,13 @@ namespace OOP_Cource.Forms
             inputPanel.Controls.Add(CreateInputRow("Сумма", txtOperationAmount));
             inputPanel.Controls.Add(CreateInputRow("Комментарий", txtOperationComment));
             inputPanel.Controls.Add(CreateButtonRow(btnAdd));
+            inputPanel.Controls.Add(CreateButtonRow(btnDelete));
 
-            var grid = CreateGrid();
-            grid.DataSource = _operations;
+            dgvOperations = CreateGrid();
+            dgvOperations.DataSource = _operations;
 
             split.Panel1.Controls.Add(inputPanel);
-            split.Panel2.Controls.Add(CreateDynamicGridHost(grid));
+            split.Panel2.Controls.Add(CreateDynamicGridHost(dgvOperations));
             ConfigureSplitLayout(split, inputPanel, 250);
             return page;
         }
@@ -376,6 +393,7 @@ namespace OOP_Cource.Forms
         private void BtnAddVehicle_Click(object sender, EventArgs e)
         {
             int capacity;
+            var vehicleNumber = txtVehicleNumber.Text.Trim();
             if (string.IsNullOrWhiteSpace(txtVehicleNumber.Text) ||
                 string.IsNullOrWhiteSpace(txtVehicleModel.Text) ||
                 !int.TryParse(txtVehicleCapacity.Text, out capacity))
@@ -384,10 +402,16 @@ namespace OOP_Cource.Forms
                 return;
             }
 
+            if (_vehicles.Any(x => string.Equals(x.Number, vehicleNumber, StringComparison.OrdinalIgnoreCase)))
+            {
+                MessageBox.Show("Транспорт с таким гос. номером уже существует.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             _vehicles.Add(new Vehicle
             {
                 Id = _vehicleId++,
-                Number = txtVehicleNumber.Text.Trim(),
+                Number = vehicleNumber,
                 Model = txtVehicleModel.Text.Trim(),
                 Capacity = capacity,
                 Status = cmbVehicleStatus.Text
@@ -433,6 +457,7 @@ namespace OOP_Cource.Forms
         private void BtnAddDriver_Click(object sender, EventArgs e)
         {
             var selectedVehicle = cmbDriverVehicle.SelectedItem as VehicleSelector;
+            var licenseNumber = txtDriverLicense.Text.Trim();
             if (string.IsNullOrWhiteSpace(txtDriverName.Text) ||
                 string.IsNullOrWhiteSpace(txtDriverLicense.Text) ||
                 selectedVehicle == null)
@@ -441,11 +466,17 @@ namespace OOP_Cource.Forms
                 return;
             }
 
+            if (_drivers.Any(x => string.Equals(x.LicenseNumber, licenseNumber, StringComparison.OrdinalIgnoreCase)))
+            {
+                MessageBox.Show("Водитель с таким номером прав уже существует.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             _drivers.Add(new Driver
             {
                 Id = _driverId++,
                 FullName = txtDriverName.Text.Trim(),
-                LicenseNumber = txtDriverLicense.Text.Trim(),
+                LicenseNumber = licenseNumber,
                 AssignedVehicle = selectedVehicle.Display
             });
 
@@ -476,6 +507,62 @@ namespace OOP_Cource.Forms
             txtOperationCategory.Clear();
             txtOperationAmount.Clear();
             txtOperationComment.Clear();
+        }
+
+        private void BtnDeleteVehicle_Click(object sender, EventArgs e)
+        {
+            var selectedVehicle = dgvVehicles.CurrentRow != null ? dgvVehicles.CurrentRow.DataBoundItem as Vehicle : null;
+            if (selectedVehicle == null)
+            {
+                MessageBox.Show("Выберите транспорт для удаления.", "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            var hasAssignedDriver = _drivers.Any(x => x.AssignedVehicle.StartsWith(selectedVehicle.Number + " - ", StringComparison.OrdinalIgnoreCase));
+            if (hasAssignedDriver)
+            {
+                MessageBox.Show("Нельзя удалить транспорт, пока он назначен водителю.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            _vehicles.Remove(selectedVehicle);
+            RefreshVehicleSelectors();
+        }
+
+        private void BtnDeleteRoute_Click(object sender, EventArgs e)
+        {
+            var selectedRoute = dgvRoutes.CurrentRow != null ? dgvRoutes.CurrentRow.DataBoundItem as Route : null;
+            if (selectedRoute == null)
+            {
+                MessageBox.Show("Выберите маршрут для удаления.", "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            _routes.Remove(selectedRoute);
+        }
+
+        private void BtnDeleteDriver_Click(object sender, EventArgs e)
+        {
+            var selectedDriver = dgvDrivers.CurrentRow != null ? dgvDrivers.CurrentRow.DataBoundItem as Driver : null;
+            if (selectedDriver == null)
+            {
+                MessageBox.Show("Выберите водителя для удаления.", "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            _drivers.Remove(selectedDriver);
+        }
+
+        private void BtnDeleteOperation_Click(object sender, EventArgs e)
+        {
+            var selectedOperation = dgvOperations.CurrentRow != null ? dgvOperations.CurrentRow.DataBoundItem as FinanceOperation : null;
+            if (selectedOperation == null)
+            {
+                MessageBox.Show("Выберите операцию для удаления.", "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            _operations.Remove(selectedOperation);
         }
 
         private void BtnSummaryReport_Click(object sender, EventArgs e)
