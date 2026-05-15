@@ -39,7 +39,7 @@
             this.lblWelcome.Font = new System.Drawing.Font("Segoe UI", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.lblWelcome.Location = new System.Drawing.Point(16, 44);
             this.lblWelcome.Name = "lblWelcome";
-            this.lblWelcome.Size = new System.Drawing.Size(949, 47);
+            this.lblWelcome.Size = new System.Drawing.Size(954, 54);
             this.lblWelcome.TabIndex = 0;
             this.lblWelcome.Text = "Курсовая работа - Бояркин Максим - 24ВП1 - Вариант 15";
             this.lblWelcome.UseCompatibleTextRendering = true;
@@ -59,9 +59,9 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.label1.Location = new System.Drawing.Point(17, 123);
+            this.label1.Location = new System.Drawing.Point(16, 118);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(994, 148);
+            this.label1.Size = new System.Drawing.Size(1016, 149);
             this.label1.TabIndex = 2;
             this.label1.Text = "Задание: «Автобусный парк»: учет транспортных средств в автопарке,\r\nмаршрутов, во" +
     "дителей, учета доходов и расходов (оплата за проезд, ремонт и\r\nт. п.), выдача от" +

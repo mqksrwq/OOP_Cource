@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
+using OOP_Cource.Forms;
 
 namespace OOP_Cource
 {
@@ -16,7 +13,7 @@ namespace OOP_Cource
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.Run(new AdminForm());
         }
     }
 }
