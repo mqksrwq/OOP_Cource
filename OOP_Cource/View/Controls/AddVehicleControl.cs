@@ -18,6 +18,7 @@ namespace OOP_Cource.View.Controls
         {
             InitializeComponent();
             _controller = controller;
+            StatusComboBox.SelectedIndex = 0;
         }
 
         public void SetDistrict(DistrictEnum district)

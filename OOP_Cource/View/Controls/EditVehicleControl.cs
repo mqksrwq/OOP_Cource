@@ -26,6 +26,11 @@ namespace OOP_Cource.View.Controls
 
         private void EditVehicleControl_Load(object sender, EventArgs e)
         {
+            FillFields();
+        }
+
+        private void FillFields()
+        {
             NumberTextBox.Text = _vehicle.Number;
             DistrictTextBox.Text = _vehicle.District;
             ModelTextBox.Text = _vehicle.Model;
@@ -36,6 +41,7 @@ namespace OOP_Cource.View.Controls
         public void SetVehicle(VehicleDTO vehicle)
         {
             _vehicle = vehicle;
+            FillFields();
         }
 
         private async void SaveButton_Click(object sender, EventArgs e)

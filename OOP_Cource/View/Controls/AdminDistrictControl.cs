@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using OOP_Cource.Controller;
 using OOP_Cource.DTO;
 using OOP_Cource.Models;
+using OOP_Cource.Utils;
 
 namespace OOP_Cource.View.Controls
 {
@@ -23,6 +26,7 @@ namespace OOP_Cource.View.Controls
             InitializeComponent();
             _controller = controller;
             _district = district;
+            ConfigureVehicleGrid();
         }
 
         private async void AdminDistrictControl_Load(object sender, EventArgs e)
@@ -32,8 +36,44 @@ namespace OOP_Cource.View.Controls
 
         private async Task LoadAllVehiclesAsync()
         {
-            var vehicles = await _controller.GetByDistrictAsync(_district.ToString());
+            var vehicles = await _controller.GetByDistrictAsync(GetCurrentDistrictName());
             LoadVehiclesByList(vehicles);
+        }
+
+        private string GetCurrentDistrictName()
+        {
+            return DistrictExtension.GetDisplayName(_district);
+        }
+
+        private void ConfigureVehicleGrid()
+        {
+            if (VehicleDataGridView.Columns.Count > 0)
+            {
+                return;
+            }
+
+            VehicleDataGridView.Columns.Add("Id", "ID");
+            VehicleDataGridView.Columns.Add("Number", "Гос. номер");
+            VehicleDataGridView.Columns.Add("District", "Район");
+            VehicleDataGridView.Columns.Add("Model", "Модель");
+            VehicleDataGridView.Columns.Add("Capacity", "Вместимость");
+            VehicleDataGridView.Columns.Add("Status", "Статус");
+
+            VehicleDataGridView.Columns.Add(new DataGridViewButtonColumn
+            {
+                Name = "Edit",
+                HeaderText = "Изменить",
+                Text = "Изменить",
+                UseColumnTextForButtonValue = true
+            });
+
+            VehicleDataGridView.Columns.Add(new DataGridViewButtonColumn
+            {
+                Name = "Delete",
+                HeaderText = "Удалить",
+                Text = "Удалить",
+                UseColumnTextForButtonValue = true
+            });
         }
 
         private void LoadVehiclesByList(List<VehicleDTO> vehicles)
@@ -64,17 +104,19 @@ namespace OOP_Cource.View.Controls
                         throw new ArgumentException("Id должен быть числом!");
 
                     var vehicle = await _controller.GetByIdAsync(id);
-                    LoadVehiclesByList(new List<VehicleDTO> { vehicle });
+                    LoadVehiclesByList(vehicle.District == GetCurrentDistrictName()
+                        ? new List<VehicleDTO> { vehicle }
+                        : new List<VehicleDTO>());
                 }
                 else if (CriteriaComboBox.SelectedIndex == 1)
                 {
                     var vehicles = await _controller.GetByNumberAsync(CriteriaValueTextBox.Text);
-                    LoadVehiclesByList(vehicles);
+                    LoadVehiclesByList(FilterCurrentDistrict(vehicles));
                 }
                 else if (CriteriaComboBox.SelectedIndex == 2)
                 {
                     var vehicles = await _controller.GetByModelAsync(CriteriaValueTextBox.Text);
-                    LoadVehiclesByList(vehicles);
+                    LoadVehiclesByList(FilterCurrentDistrict(vehicles));
                 }
                 else if (CriteriaComboBox.SelectedIndex == 3)
                 {
@@ -82,12 +124,12 @@ namespace OOP_Cource.View.Controls
                         throw new ArgumentException("Вместимость должна быть числом!");
 
                     var vehicles = await _controller.GetByCapacityAsync(capacity);
-                    LoadVehiclesByList(vehicles);
+                    LoadVehiclesByList(FilterCurrentDistrict(vehicles));
                 }
                 else if (CriteriaComboBox.SelectedIndex == 4)
                 {
                     var vehicles = await _controller.GetByStatusAsync(CriteriaValueTextBox.Text);
-                    LoadVehiclesByList(vehicles);
+                    LoadVehiclesByList(FilterCurrentDistrict(vehicles));
                 }
             }
             catch (Exception ex)
@@ -101,6 +143,12 @@ namespace OOP_Cource.View.Controls
             CriteriaComboBox.SelectedItem = null;
             CriteriaValueTextBox.Text = string.Empty;
             await LoadAllVehiclesAsync();
+        }
+
+        private List<VehicleDTO> FilterCurrentDistrict(List<VehicleDTO> vehicles)
+        {
+            var district = GetCurrentDistrictName();
+            return vehicles.Where(vehicle => vehicle.District == district).ToList();
         }
 
         private async void VehicleDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -147,7 +195,7 @@ namespace OOP_Cource.View.Controls
                 MessageBoxDefaultButton.Button2);
             if (result == DialogResult.Yes)
             {
-                await _controller.DeleteAllAsync();
+                await _controller.DeleteByDistrictAsync(GetCurrentDistrictName());
                 await LoadAllVehiclesAsync();
                 MessageBox.Show("Все записи района удалены!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
             }
@@ -156,6 +204,108 @@ namespace OOP_Cource.View.Controls
         private void BackButton_Click(object sender, EventArgs e)
         {
             CloseButtonEvent?.Invoke();
+        }
+
+        private async void ReportButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (var dialog = new SaveFileDialog())
+                {
+                    dialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+                    dialog.FileName = $"report_{GetCurrentDistrictName()}.txt";
+
+                    if (dialog.ShowDialog() != DialogResult.OK)
+                        return;
+
+                    var vehicles = await _controller.GetByDistrictAsync(GetCurrentDistrictName());
+                    File.WriteAllText(dialog.FileName, CreateReport(vehicles), new UTF8Encoding(true));
+                    MessageBox.Show("Отчет успешно сохранен!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка сохранения отчета", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async void CsvButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (var dialog = new SaveFileDialog())
+                {
+                    dialog.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
+                    dialog.FileName = $"vehicles_{GetCurrentDistrictName()}.csv";
+
+                    if (dialog.ShowDialog() != DialogResult.OK)
+                        return;
+
+                    var vehicles = await _controller.GetByDistrictAsync(GetCurrentDistrictName());
+                    File.WriteAllText(dialog.FileName, CreateCsv(vehicles), new UTF8Encoding(true));
+                    MessageBox.Show("CSV файл успешно сохранен!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка сохранения CSV", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private string CreateReport(List<VehicleDTO> vehicles)
+        {
+            var builder = new StringBuilder();
+            builder.AppendLine("Отчет по транспортным средствам автопарка");
+            builder.AppendLine($"Район: {GetCurrentDistrictName()}");
+            builder.AppendLine($"Дата формирования: {DateTime.Now:dd.MM.yyyy HH:mm}");
+            builder.AppendLine($"Количество записей: {vehicles.Count}");
+            builder.AppendLine();
+
+            if (vehicles.Count == 0)
+            {
+                builder.AppendLine("Записи отсутствуют.");
+                return builder.ToString();
+            }
+
+            foreach (var vehicle in vehicles)
+            {
+                builder.AppendLine($"ID: {vehicle.Id}");
+                builder.AppendLine($"Гос. номер: {vehicle.Number}");
+                builder.AppendLine($"Район: {vehicle.District}");
+                builder.AppendLine($"Модель: {vehicle.Model}");
+                builder.AppendLine($"Вместимость: {vehicle.Capacity}");
+                builder.AppendLine($"Статус: {vehicle.Status}");
+                builder.AppendLine(new string('-', 40));
+            }
+
+            return builder.ToString();
+        }
+
+        private string CreateCsv(List<VehicleDTO> vehicles)
+        {
+            var builder = new StringBuilder();
+            builder.AppendLine("ID;Гос. номер;Район;Модель;Вместимость;Статус");
+
+            foreach (var vehicle in vehicles)
+            {
+                builder.AppendLine(string.Join(";",
+                    EscapeCsv(vehicle.Id.ToString()),
+                    EscapeCsv(vehicle.Number),
+                    EscapeCsv(vehicle.District),
+                    EscapeCsv(vehicle.Model),
+                    EscapeCsv(vehicle.Capacity.ToString()),
+                    EscapeCsv(vehicle.Status)));
+            }
+
+            return builder.ToString();
+        }
+
+        private static string EscapeCsv(string value)
+        {
+            if (value == null)
+                return string.Empty;
+
+            return "\"" + value.Replace("\"", "\"\"") + "\"";
         }
     }
 }

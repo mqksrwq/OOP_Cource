@@ -1,6 +1,10 @@
 using OOP_Cource.Models;
 using OOP_Cource.Repository;
 using OOP_Cource.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace OOP_Cource.Service
 {
@@ -107,6 +111,12 @@ namespace OOP_Cource.Service
         public async Task DeleteAllAsync()
         {
             await _vehicleRepository.DeleteAllAsync();
+        }
+
+        public async Task DeleteByDistrictAsync(string district)
+        {
+            Validator.ValidateDistrict(district);
+            await _vehicleRepository.DeleteByDistrictAsync(district);
         }
     }
 }

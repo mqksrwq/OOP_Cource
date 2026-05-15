@@ -85,9 +85,9 @@ namespace OOP_Cource.View.Controls
             // 
             // btnAdd
             // 
-            this.btnAdd.Location = new System.Drawing.Point(260, 300);
+            this.btnAdd.Location = new System.Drawing.Point(260, 315);
             this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(150, 45);
+            this.btnAdd.Size = new System.Drawing.Size(190, 60);
             this.btnAdd.TabIndex = 5;
             this.btnAdd.Text = "Добавить";
             this.btnAdd.UseVisualStyleBackColor = true;
@@ -95,9 +95,9 @@ namespace OOP_Cource.View.Controls
             // 
             // btnBack
             // 
-            this.btnBack.Location = new System.Drawing.Point(420, 300);
+            this.btnBack.Location = new System.Drawing.Point(480, 315);
             this.btnBack.Name = "btnBack";
-            this.btnBack.Size = new System.Drawing.Size(150, 45);
+            this.btnBack.Size = new System.Drawing.Size(190, 60);
             this.btnBack.TabIndex = 6;
             this.btnBack.Text = "Назад";
             this.btnBack.UseVisualStyleBackColor = true;
@@ -165,7 +165,7 @@ namespace OOP_Cource.View.Controls
             this.Controls.Add(this.DistrictTextBox);
             this.Controls.Add(this.NumberTextBox);
             this.Name = "AddVehicleControl";
-            this.Size = new System.Drawing.Size(720, 400);
+            this.Size = new System.Drawing.Size(780, 450);
             this.ResumeLayout(false);
             this.PerformLayout();
         }

@@ -1,130 +1,212 @@
-using Dapper;
-using Npgsql;
 using OOP_Cource.Config;
 using OOP_Cource.Models;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace OOP_Cource.Repository
 {
-    /// <summary>
-    /// Класс репозитория транспорта.
-    /// Наследует методы интерфейса IVehicleRepository
-    /// </summary>
     public class VehicleRepository : IVehicleRepository
     {
-        private readonly string _connectionString;
+        private static readonly object StorageLock = new object();
+        private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+        {
+            WriteIndented = true
+        };
+
+        private readonly string _databasePath;
 
         public VehicleRepository()
         {
-            _connectionString = AppConfig.ConnectionString;
+            _databasePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppConfig.LocalDatabasePath);
+            EnsureStorageCreated();
         }
 
-        private NpgsqlConnection CreateConnection()
+        public Task<IEnumerable<Vehicle>> GetAllAsync()
         {
-            return new NpgsqlConnection(_connectionString);
+            return Task.FromResult<IEnumerable<Vehicle>>(ReadVehicles());
         }
 
-        public async Task<IEnumerable<Vehicle>> GetAllAsync()
+        public Task<Vehicle> GetByIdAsync(int id)
         {
-            using var connection = CreateConnection();
-            var sql = "SELECT * FROM Vehicles";
-            return await connection.QueryAsync<Vehicle>(sql);
+            var vehicle = ReadVehicles().FirstOrDefault(item => item.Id == id);
+            return Task.FromResult(vehicle);
         }
 
-        public async Task<Vehicle?> GetByIdAsync(int id)
+        public Task<IEnumerable<Vehicle>> GetByNumberAsync(string number)
         {
-            using var connection = CreateConnection();
-            var sql = "SELECT * FROM Vehicles WHERE Id = @Id";
-            return await connection.QueryFirstOrDefaultAsync<Vehicle>(sql, new { Id = id });
+            var vehicles = ReadVehicles()
+                .Where(vehicle => ContainsIgnoreCase(vehicle.Number, number))
+                .ToList();
+
+            return Task.FromResult<IEnumerable<Vehicle>>(vehicles);
         }
 
-        public async Task<IEnumerable<Vehicle>> GetByNumberAsync(string number)
+        public Task<IEnumerable<Vehicle>> GetByDistrictAsync(string district)
         {
-            using var connection = CreateConnection();
-            var sql = "SELECT * FROM Vehicles WHERE Number LIKE @Number";
-            return await connection.QueryAsync<Vehicle>(sql, new { Number = $"%{number}%" });
+            var vehicles = ReadVehicles()
+                .Where(vehicle => ContainsIgnoreCase(vehicle.District, district))
+                .ToList();
+
+            return Task.FromResult<IEnumerable<Vehicle>>(vehicles);
         }
 
-        public async Task<IEnumerable<Vehicle>> GetByDistrictAsync(string district)
+        public Task<IEnumerable<Vehicle>> GetByModelAsync(string model)
         {
-            using var connection = CreateConnection();
-            var sql = "SELECT * FROM Vehicles WHERE District LIKE @District";
-            return await connection.QueryAsync<Vehicle>(sql, new { District = $"%{district}%" });
+            var vehicles = ReadVehicles()
+                .Where(vehicle => ContainsIgnoreCase(vehicle.Model, model))
+                .ToList();
+
+            return Task.FromResult<IEnumerable<Vehicle>>(vehicles);
         }
 
-        public async Task<IEnumerable<Vehicle>> GetByModelAsync(string model)
+        public Task<IEnumerable<Vehicle>> GetByCapacityAsync(int capacity)
         {
-            using var connection = CreateConnection();
-            var sql = "SELECT * FROM Vehicles WHERE Model LIKE @Model";
-            return await connection.QueryAsync<Vehicle>(sql, new { Model = $"%{model}%" });
+            var vehicles = ReadVehicles()
+                .Where(vehicle => vehicle.Capacity == capacity)
+                .ToList();
+
+            return Task.FromResult<IEnumerable<Vehicle>>(vehicles);
         }
 
-        public async Task<IEnumerable<Vehicle>> GetByCapacityAsync(int capacity)
+        public Task<IEnumerable<Vehicle>> GetByStatusAsync(string status)
         {
-            using var connection = CreateConnection();
-            var sql = "SELECT * FROM Vehicles WHERE Capacity = @Capacity";
-            return await connection.QueryAsync<Vehicle>(sql, new { Capacity = capacity });
+            var vehicles = ReadVehicles()
+                .Where(vehicle => ContainsIgnoreCase(vehicle.Status, status))
+                .ToList();
+
+            return Task.FromResult<IEnumerable<Vehicle>>(vehicles);
         }
 
-        public async Task<IEnumerable<Vehicle>> GetByStatusAsync(string status)
+        public Task AddAsync(Vehicle newVehicle)
         {
-            using var connection = CreateConnection();
-            var sql = "SELECT * FROM Vehicles WHERE Status LIKE @Status";
-            return await connection.QueryAsync<Vehicle>(sql, new { Status = $"%{status}%" });
-        }
-
-        public async Task AddAsync(Vehicle newVehicle)
-        {
-            using var connection = CreateConnection();
-            var sql = @"
-            INSERT INTO Vehicles (Number, District, Model, Capacity, Status)
-            VALUES (@Number, @District, @Model, @Capacity, @Status)
-            RETURNING Id";
-
-            newVehicle.Id = await connection.QuerySingleAsync<int>(sql, new
+            lock (StorageLock)
             {
-                newVehicle.Number,
-                newVehicle.District,
-                newVehicle.Model,
-                newVehicle.Capacity,
-                newVehicle.Status
-            });
+                var vehicles = ReadVehiclesUnsafe();
+                newVehicle.Id = GetNextId(vehicles);
+                vehicles.Add(newVehicle);
+                WriteVehiclesUnsafe(vehicles);
+            }
+
+            return Task.CompletedTask;
         }
 
-        public async Task UpdateAsync(Vehicle editVehicle)
+        public Task UpdateAsync(Vehicle editVehicle)
         {
-            using var connection = CreateConnection();
-            var sql = @"
-            UPDATE Vehicles
-            SET Number = @Number,
-                District = @District,
-                Model = @Model,
-                Capacity = @Capacity,
-                Status = @Status
-            WHERE Id = @Id";
-
-            await connection.ExecuteAsync(sql, new
+            lock (StorageLock)
             {
-                editVehicle.Id,
-                editVehicle.Number,
-                editVehicle.District,
-                editVehicle.Model,
-                editVehicle.Capacity,
-                editVehicle.Status
-            });
+                var vehicles = ReadVehiclesUnsafe();
+                var vehicle = vehicles.FirstOrDefault(item => item.Id == editVehicle.Id);
+                if (vehicle != null)
+                {
+                    vehicle.Number = editVehicle.Number;
+                    vehicle.District = editVehicle.District;
+                    vehicle.Model = editVehicle.Model;
+                    vehicle.Capacity = editVehicle.Capacity;
+                    vehicle.Status = editVehicle.Status;
+                    WriteVehiclesUnsafe(vehicles);
+                }
+            }
+
+            return Task.CompletedTask;
         }
 
-        public async Task DeleteAsync(int id)
+        public Task DeleteAsync(int id)
         {
-            using var connection = CreateConnection();
-            var sql = "DELETE FROM Vehicles WHERE Id = @Id";
-            await connection.ExecuteAsync(sql, new { Id = id });
+            lock (StorageLock)
+            {
+                var vehicles = ReadVehiclesUnsafe();
+                vehicles.RemoveAll(vehicle => vehicle.Id == id);
+                WriteVehiclesUnsafe(vehicles);
+            }
+
+            return Task.CompletedTask;
         }
 
-        public async Task DeleteAllAsync()
+        public Task DeleteAllAsync()
         {
-            using var connection = CreateConnection();
-            var sql = "DELETE FROM Vehicles";
-            await connection.ExecuteAsync(sql);
+            lock (StorageLock)
+            {
+                WriteVehiclesUnsafe(new List<Vehicle>());
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteByDistrictAsync(string district)
+        {
+            lock (StorageLock)
+            {
+                var vehicles = ReadVehiclesUnsafe();
+                vehicles.RemoveAll(vehicle => string.Equals(vehicle.District, district, StringComparison.OrdinalIgnoreCase));
+                WriteVehiclesUnsafe(vehicles);
+            }
+
+            return Task.CompletedTask;
+        }
+
+        private void EnsureStorageCreated()
+        {
+            lock (StorageLock)
+            {
+                var directory = Path.GetDirectoryName(_databasePath);
+                if (!string.IsNullOrEmpty(directory))
+                    Directory.CreateDirectory(directory);
+
+                if (!File.Exists(_databasePath))
+                    WriteVehiclesUnsafe(new List<Vehicle>());
+            }
+        }
+
+        private List<Vehicle> ReadVehicles()
+        {
+            lock (StorageLock)
+            {
+                return ReadVehiclesUnsafe();
+            }
+        }
+
+        private List<Vehicle> ReadVehiclesUnsafe()
+        {
+            if (!File.Exists(_databasePath))
+                return new List<Vehicle>();
+
+            var json = File.ReadAllText(_databasePath);
+            if (string.IsNullOrWhiteSpace(json))
+                return new List<Vehicle>();
+
+            try
+            {
+                return JsonSerializer.Deserialize<List<Vehicle>>(json) ?? new List<Vehicle>();
+            }
+            catch (JsonException)
+            {
+                return new List<Vehicle>();
+            }
+        }
+
+        private void WriteVehiclesUnsafe(List<Vehicle> vehicles)
+        {
+            var json = JsonSerializer.Serialize(vehicles, JsonOptions);
+            File.WriteAllText(_databasePath, json);
+        }
+
+        private static int GetNextId(IEnumerable<Vehicle> vehicles)
+        {
+            return vehicles.Any()
+                ? vehicles.Max(vehicle => vehicle.Id) + 1
+                : 1;
+        }
+
+        private static bool ContainsIgnoreCase(string source, string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return true;
+
+            return source != null && source.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0;
         }
     }
 }

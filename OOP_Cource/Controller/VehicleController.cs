@@ -1,5 +1,8 @@
 using OOP_Cource.DTO;
 using OOP_Cource.Service;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace OOP_Cource.Controller
 {
@@ -139,6 +142,11 @@ namespace OOP_Cource.Controller
         public async Task DeleteAllAsync()
         {
             await _vehicleService.DeleteAllAsync();
+        }
+
+        public async Task DeleteByDistrictAsync(string district)
+        {
+            await _vehicleService.DeleteByDistrictAsync(district);
         }
     }
 }

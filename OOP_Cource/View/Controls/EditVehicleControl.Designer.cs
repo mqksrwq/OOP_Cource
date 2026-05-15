@@ -84,9 +84,9 @@ namespace OOP_Cource.View.Controls
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(260, 300);
+            this.btnSave.Location = new System.Drawing.Point(260, 315);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(150, 45);
+            this.btnSave.Size = new System.Drawing.Size(190, 60);
             this.btnSave.TabIndex = 5;
             this.btnSave.Text = "Сохранить";
             this.btnSave.UseVisualStyleBackColor = true;
@@ -94,9 +94,9 @@ namespace OOP_Cource.View.Controls
             // 
             // btnBack
             // 
-            this.btnBack.Location = new System.Drawing.Point(420, 300);
+            this.btnBack.Location = new System.Drawing.Point(480, 315);
             this.btnBack.Name = "btnBack";
-            this.btnBack.Size = new System.Drawing.Size(150, 45);
+            this.btnBack.Size = new System.Drawing.Size(190, 60);
             this.btnBack.TabIndex = 6;
             this.btnBack.Text = "Назад";
             this.btnBack.UseVisualStyleBackColor = true;
@@ -164,7 +164,7 @@ namespace OOP_Cource.View.Controls
             this.Controls.Add(this.DistrictTextBox);
             this.Controls.Add(this.NumberTextBox);
             this.Name = "EditVehicleControl";
-            this.Size = new System.Drawing.Size(720, 400);
+            this.Size = new System.Drawing.Size(780, 450);
             this.Load += new System.EventHandler(this.EditVehicleControl_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

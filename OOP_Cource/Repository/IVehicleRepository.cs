@@ -1,4 +1,6 @@
 using OOP_Cource.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace OOP_Cource.Repository
 {
@@ -15,7 +17,7 @@ namespace OOP_Cource.Repository
         /// <summary>
         /// Асинхронный метод для получения объекта по id
         /// </summary>
-        Task<Vehicle?> GetByIdAsync(int id);
+        Task<Vehicle> GetByIdAsync(int id);
 
         /// <summary>
         /// Асинхронный метод для получения объектов по гос. номеру
@@ -61,5 +63,10 @@ namespace OOP_Cource.Repository
         /// Асинхронный метод для удаления всех записей
         /// </summary>
         Task DeleteAllAsync();
+
+        /// <summary>
+        /// Асинхронный метод для удаления записей выбранного района
+        /// </summary>
+        Task DeleteByDistrictAsync(string district);
     }
 }
