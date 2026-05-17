@@ -7,15 +7,32 @@ using OOP_Cource.Utils;
 
 namespace OOP_Cource.View.Controls
 {
+    /// <summary>
+    /// Главный элемент управления администратора с вкладками по районам
+    /// </summary>
     public partial class AdminControl : UserControl
     {
         private readonly VehicleController _controller;
         private readonly Dictionary<DistrictEnum, AdminDistrictControl> _districts;
 
+        /// <summary>
+        /// Событие запроса добавления транспорта в указанный район
+        /// </summary>
         public event Action<DistrictEnum> AddVehicleRequested;
+
+        /// <summary>
+        /// Событие запроса редактирования транспорта по идентификатору
+        /// </summary>
         public event Func<int, System.Threading.Tasks.Task> ChangeVehicleRequested;
+
+        /// <summary>
+        /// Событие запроса закрытия главной формы
+        /// </summary>
         public event Action CloseFormRequest;
 
+        /// <summary>
+        /// Инициализирует элемент управления и словарь дочерних элементов по районам
+        /// </summary>
         public AdminControl(VehicleController controller)
         {
             InitializeComponent();
@@ -23,11 +40,17 @@ namespace OOP_Cource.View.Controls
             _districts = new Dictionary<DistrictEnum, AdminDistrictControl>();
         }
 
+        /// <summary>
+        /// Инициализирует вкладки по районам при загрузке элемента управления
+        /// </summary>
         private void AdminControl_Load(object sender, EventArgs e)
         {
             InitializeDistrictTabs();
         }
 
+        /// <summary>
+        /// Создаёт вкладку для каждого района и добавляет соответствующий элемент управления
+        /// </summary>
         public void InitializeDistrictTabs()
         {
             DistrictTabControl.TabPages.Clear();

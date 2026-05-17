@@ -1,0 +1,131 @@
+Index: OOP_Cource.Setup/OOP_Cource.Setup.vdproj
+===================================================================
+diff --git a/OOP_Cource.Setup/OOP_Cource.Setup.vdproj b/OOP_Cource.Setup/OOP_Cource.Setup.vdproj
+deleted file mode 100644
+--- a/OOP_Cource.Setup/OOP_Cource.Setup.vdproj	(revision 45d61d08c56250facdd10963455261d6a3dd6eca)
++++ /dev/null	(revision 45d61d08c56250facdd10963455261d6a3dd6eca)
+@@ -1,35 +0,0 @@
+-"DeploymentProject"
+-{
+-"ProjectType" = "3:0"
+-"IsDeployment" = "11:TRUE"
+-"ProjectName" = "8:OOP_Cource.Setup"
+-"ProjectGUID" = "8:{F4C4E2D5-8E61-4E91-9C0D-0E3C2CF4585A}"
+-"ProjectVersion" = "8:1.0.0"
+-"OutputFilename" = "8:setup.exe"
+-"Configurations" = "{"
+-"Debug" = "{"
+-"OutputPath" = "8:..\\bin\\Debug\\"
+-"PackageCode" = "8:{B34C7E2C-1E4E-4B34-8A85-5E0F5C4C4C1E}"
+-"ProductCode" = "8:{A83989C7-8088-4B90-AD0E-3E3FCE66BDF5}"
+-"ProductName" = "8:OOP_Cource"
+-"Manufacturer" = "8:OOP_Cource"
+-"UpgradeCode" = "8:{D50C6E5A-9C39-46B6-8D42-2B80C19143D2}"
+-"InstallAllUsers" = "11:FALSE"
+-"ConfigurationType" = "3:1"
+-"" = "8:"
+-"}" = ""
+-"Release" = "{"
+-"OutputPath" = "8:..\\bin\\Release\\"
+-"PackageCode" = "8:{3E7F1F2E-7C6A-4AE1-9B44-5A6D1E7F0C3D}"
+-"ProductCode" = "8:{0B6A5A52-8B08-4C02-9D9D-3CE0A6356F22}"
+-"ProductName" = "8:OOP_Cource"
+-"Manufacturer" = "8:OOP_Cource"
+-"UpgradeCode" = "8:{D50C6E5A-9C39-46B6-8D42-2B80C19143D2}"
+-"InstallAllUsers" = "11:FALSE"
+-"ConfigurationType" = "3:1"
+-"" = "8:"
+-"}" = ""
+-"}" = ""
+-"Files" = "{"
+-"}" = ""
+-}
+Index: OOP_Cource/Program.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>using System.Windows.Forms;\r\nusing OOP_Cource.Forms;\r\nusing System;\r\n\r\nnamespace OOP_Cource\r\n{\r\n    /// <summary>\r\n    /// Основной класс запуска приложения.\r\n    /// </summary>\r\n    internal static class Program\r\n    {\r\n        /// <summary>\r\n        /// Главная точка входа в приложение.\r\n        /// </summary>\r\n        [STAThread]\r\n        private static void Main()\r\n        {\r\n            Application.EnableVisualStyles();\r\n            Application.SetCompatibleTextRenderingDefault(false);\r\n            Application.Run(new AdminForm());\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/OOP_Cource/Program.cs b/OOP_Cource/Program.cs
+--- a/OOP_Cource/Program.cs	(revision 45d61d08c56250facdd10963455261d6a3dd6eca)
++++ b/OOP_Cource/Program.cs	(date 1779026886505)
+@@ -17,7 +17,7 @@
+         {
+             Application.EnableVisualStyles();
+             Application.SetCompatibleTextRenderingDefault(false);
+-            Application.Run(new AdminForm());
++            Application.Run(new Form1());
+         }
+     }
+ }
+Index: OOP_Cource/packages.config
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<packages>\r\n\t<package id=\"Dapper\" version=\"2.1.72\" targetFramework=\"net481\" />\r\n  <package id=\"Npgsql\" version=\"10.0.2\" targetFramework=\"net481\" />\r\n  <package id=\"Microsoft.Bcl.AsyncInterfaces\" version=\"9.0.1\" targetFramework=\"net481\" />\r\n  <package id=\"System.Buffers\" version=\"4.5.0\" targetFramework=\"net481\" />\r\n  <package id=\"System.Memory\" version=\"4.5.3\" targetFramework=\"net481\" />\r\n  <package id=\"System.Numerics.Vectors\" version=\"4.5.0\" targetFramework=\"net481\" />\r\n  <package id=\"System.Runtime.CompilerServices.Unsafe\" version=\"4.6.0\" targetFramework=\"net481\" />\r\n  <package id=\"System.Text.Encodings.Web\" version=\"4.6.0\" targetFramework=\"net481\" />\r\n  <package id=\"System.Text.Json\" version=\"4.6.0\" targetFramework=\"net481\" />\r\n  <package id=\"System.Threading.Tasks.Extensions\" version=\"4.5.4\" targetFramework=\"net481\" />\r\n  <package id=\"System.ValueTuple\" version=\"4.5.0\" targetFramework=\"net481\" />\r\n</packages>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/OOP_Cource/packages.config b/OOP_Cource/packages.config
+--- a/OOP_Cource/packages.config	(revision 45d61d08c56250facdd10963455261d6a3dd6eca)
++++ b/OOP_Cource/packages.config	(date 1779026542942)
+@@ -1,14 +1,14 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <packages>
+ 	<package id="Dapper" version="2.1.72" targetFramework="net481" />
+-  <package id="Npgsql" version="10.0.2" targetFramework="net481" />
++  <package id="Npgsql" version="4.1.14" targetFramework="net481" />
+   <package id="Microsoft.Bcl.AsyncInterfaces" version="9.0.1" targetFramework="net481" />
+   <package id="System.Buffers" version="4.5.0" targetFramework="net481" />
+   <package id="System.Memory" version="4.5.3" targetFramework="net481" />
+   <package id="System.Numerics.Vectors" version="4.5.0" targetFramework="net481" />
+   <package id="System.Runtime.CompilerServices.Unsafe" version="4.6.0" targetFramework="net481" />
+-  <package id="System.Text.Encodings.Web" version="4.6.0" targetFramework="net481" />
++  <package id="System.Text.Encodings.Web" version="4.7.2" targetFramework="net481" />
+   <package id="System.Text.Json" version="4.6.0" targetFramework="net481" />
+   <package id="System.Threading.Tasks.Extensions" version="4.5.4" targetFramework="net481" />
+   <package id="System.ValueTuple" version="4.5.0" targetFramework="net481" />
+-</packages>
+\ No newline at end of file
++</packages>
+Index: OOP_Cource/OOP_Cource.csproj
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<Project ToolsVersion=\"15.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">\r\n  <Import Project=\"$(MSBuildExtensionsPath)\\$(MSBuildToolsVersion)\\Microsoft.Common.props\" Condition=\"Exists('$(MSBuildExtensionsPath)\\$(MSBuildToolsVersion)\\Microsoft.Common.props')\" />\r\n  <PropertyGroup>\r\n    <Configuration Condition=\" '$(Configuration)' == '' \">Debug</Configuration>\r\n    <Platform Condition=\" '$(Platform)' == '' \">AnyCPU</Platform>\r\n    <ProjectGuid>{72A7266D-2A19-4001-8BF7-751479C1A989}</ProjectGuid>\r\n    <OutputType>WinExe</OutputType>\r\n    <RootNamespace>OOP_Cource</RootNamespace>\r\n    <AssemblyName>OOP_Cource</AssemblyName>\r\n    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>\r\n    <LangVersion>8.0</LangVersion>\r\n    <FileAlignment>512</FileAlignment>\r\n    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>\r\n    <PreferNativeArm64>true</PreferNativeArm64>\r\n    <Deterministic>true</Deterministic>\r\n  </PropertyGroup>\r\n  <PropertyGroup Condition=\" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' \">\r\n    <PlatformTarget>AnyCPU</PlatformTarget>\r\n    <DebugSymbols>true</DebugSymbols>\r\n    <DebugType>full</DebugType>\r\n    <Optimize>false</Optimize>\r\n    <OutputPath>bin\\Debug\\</OutputPath>\r\n    <DefineConstants>DEBUG;TRACE</DefineConstants>\r\n    <ErrorReport>prompt</ErrorReport>\r\n    <WarningLevel>4</WarningLevel>\r\n  </PropertyGroup>\r\n  <PropertyGroup Condition=\" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' \">\r\n    <PlatformTarget>AnyCPU</PlatformTarget>\r\n    <DebugType>pdbonly</DebugType>\r\n    <Optimize>true</Optimize>\r\n    <OutputPath>bin\\Release\\</OutputPath>\r\n    <DefineConstants>TRACE</DefineConstants>\r\n    <ErrorReport>prompt</ErrorReport>\r\n    <WarningLevel>4</WarningLevel>\r\n  </PropertyGroup>\r\n  <ItemGroup>\r\n    <Reference Include=\"Dapper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL\">\r\n      <HintPath>..\\packages\\Dapper.2.1.72\\lib\\net461\\Dapper.dll</HintPath>\r\n    </Reference>\r\n    <Reference Include=\"Microsoft.Bcl.AsyncInterfaces, Version=9.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL\">\r\n      <HintPath>..\\packages\\Microsoft.Bcl.AsyncInterfaces.9.0.1\\lib\\net462\\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>\r\n    </Reference>\r\n    <Reference Include=\"System\">\r\n      <HintPath>..\\..\\..\\..\\..\\..\\Program Files (x86)\\Reference Assemblies\\Microsoft\\Framework\\.NETFramework\\v4.8.1\\System.dll</HintPath>\r\n    </Reference>\r\n    <Reference Include=\"System.Core\" />\r\n    <Reference Include=\"System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL\">\r\n      <HintPath>..\\packages\\System.Threading.Tasks.Extensions.4.5.4\\lib\\net461\\System.Threading.Tasks.Extensions.dll</HintPath>\r\n    </Reference>\r\n    <Reference Include=\"System.Xml.Linq\" />\r\n    <Reference Include=\"System.Data.DataSetExtensions\" />\r\n    <Reference Include=\"Microsoft.CSharp\" />\r\n    <Reference Include=\"System.Data\" />\r\n    <Reference Include=\"System.Deployment\" />\r\n    <Reference Include=\"System.Drawing\" />\r\n    <Reference Include=\"System.Buffers\">\r\n      <HintPath>..\\packages\\System.Buffers.4.5.0\\lib\\netstandard2.0\\System.Buffers.dll</HintPath>\r\n    </Reference>\r\n    <Reference Include=\"System.Memory\">\r\n      <HintPath>..\\packages\\System.Memory.4.5.3\\lib\\netstandard2.0\\System.Memory.dll</HintPath>\r\n    </Reference>\r\n    <Reference Include=\"System.Numerics.Vectors\">\r\n      <HintPath>..\\packages\\System.Numerics.Vectors.4.5.0\\lib\\net46\\System.Numerics.Vectors.dll</HintPath>\r\n    </Reference>\r\n    <Reference Include=\"System.Runtime.CompilerServices.Unsafe\">\r\n      <HintPath>..\\packages\\System.Runtime.CompilerServices.Unsafe.4.6.0\\lib\\netstandard2.0\\System.Runtime.CompilerServices.Unsafe.dll</HintPath>\r\n    </Reference>\r\n    <Reference Include=\"System.Text.Encodings.Web\">\r\n      <HintPath>..\\packages\\System.Text.Encodings.Web.4.6.0\\lib\\netstandard2.0\\System.Text.Encodings.Web.dll</HintPath>\r\n    </Reference>\r\n    <Reference Include=\"System.Text.Json\">\r\n      <HintPath>..\\packages\\System.Text.Json.4.6.0\\lib\\net461\\System.Text.Json.dll</HintPath>\r\n    </Reference>\r\n    <Reference Include=\"System.ValueTuple\">\r\n      <HintPath>..\\packages\\System.ValueTuple.4.5.0\\lib\\net461\\System.ValueTuple.dll</HintPath>\r\n    </Reference>\r\n    <Reference Include=\"System.Net.Http\" />\r\n    <Reference Include=\"System.Windows.Forms\" />\r\n    <Reference Include=\"System.Xml\" />\r\n  </ItemGroup>\r\n  <ItemGroup>\r\n    <Compile Include=\"Config\\AppConfig.cs\" />\r\n    <Compile Include=\"Controller\\VehicleController.cs\" />\r\n    <Compile Include=\"DTO\\VehicleDTO.cs\" />\r\n    <Compile Include=\"Form1.cs\">\r\n      <SubType>Form</SubType>\r\n    </Compile>\r\n    <Compile Include=\"Form1.Designer.cs\">\r\n      <DependentUpon>Form1.cs</DependentUpon>\r\n    </Compile>\r\n    <Compile Include=\"Forms\\AdminForm.cs\">\r\n      <SubType>Form</SubType>\r\n    </Compile>\r\n    <Compile Include=\"Forms\\AdminForm.Designer.cs\">\r\n      <DependentUpon>AdminForm.cs</DependentUpon>\r\n    </Compile>\r\n    <Compile Include=\"Forms\\HelloControl.cs\">\r\n      <SubType>UserControl</SubType>\r\n    </Compile>\r\n    <Compile Include=\"Forms\\HelloControl.Designer.cs\">\r\n      <DependentUpon>HelloControl.cs</DependentUpon>\r\n    </Compile>\r\n    <Compile Include=\"Forms\\HelloForm.cs\">\r\n      <SubType>Form</SubType>\r\n    </Compile>\r\n    <Compile Include=\"Forms\\HelloForm.Designer.cs\">\r\n      <DependentUpon>HelloForm.cs</DependentUpon>\r\n    </Compile>\r\n    <Compile Include=\"Forms\\MainForm.cs\">\r\n      <SubType>Form</SubType>\r\n    </Compile>\r\n    <Compile Include=\"Models\\DistrictEnum.cs\" />\r\n    <Compile Include=\"Models\\Driver.cs\" />\r\n    <Compile Include=\"Models\\FinanceOperation.cs\" />\r\n    <Compile Include=\"Models\\Route.cs\" />\r\n    <Compile Include=\"Models\\Vehicle.cs\" />\r\n    <Compile Include=\"Models\\VehicleSelector.cs\" />\r\n    <Compile Include=\"Program.cs\" />\r\n    <Compile Include=\"Properties\\AssemblyInfo.cs\" />\r\n    <Compile Include=\"Repository\\IVehicleRepository.cs\" />\r\n    <Compile Include=\"Repository\\VehicleRepository.cs\" />\r\n    <Compile Include=\"Repository\\VehicleSearchFilter.cs\" />\r\n    <Compile Include=\"Service\\VehicleService.cs\" />\r\n    <Compile Include=\"Utils\\DistrictExtension.cs\" />\r\n    <Compile Include=\"Utils\\Validator.cs\" />\r\n    <Compile Include=\"View\\Controls\\AddVehicleControl.cs\">\r\n      <SubType>UserControl</SubType>\r\n    </Compile>\r\n    <Compile Include=\"View\\Controls\\AddVehicleControl.Designer.cs\">\r\n      <DependentUpon>AddVehicleControl.cs</DependentUpon>\r\n    </Compile>\r\n    <Compile Include=\"View\\Controls\\AdminControl.cs\">\r\n      <SubType>UserControl</SubType>\r\n    </Compile>\r\n    <Compile Include=\"View\\Controls\\AdminControl.Designer.cs\" />\r\n    <Compile Include=\"View\\Controls\\AdminDistrictControl.cs\">\r\n      <SubType>UserControl</SubType>\r\n    </Compile>\r\n    <Compile Include=\"View\\Controls\\AdminDistrictControl.Designer.cs\">\r\n      <DependentUpon>AdminDistrictControl.cs</DependentUpon>\r\n    </Compile>\r\n    <Compile Include=\"View\\Controls\\EditVehicleControl.cs\">\r\n      <SubType>UserControl</SubType>\r\n    </Compile>\r\n    <Compile Include=\"View\\Controls\\EditVehicleControl.Designer.cs\" />\r\n    <EmbeddedResource Include=\"Form1.resx\">\r\n      <DependentUpon>Form1.cs</DependentUpon>\r\n    </EmbeddedResource>\r\n    <EmbeddedResource Include=\"Properties\\Resources.resx\">\r\n      <Generator>ResXFileCodeGenerator</Generator>\r\n      <LastGenOutput>Resources.Designer.cs</LastGenOutput>\r\n      <SubType>Designer</SubType>\r\n    </EmbeddedResource>\r\n    <Compile Include=\"Properties\\Resources.Designer.cs\">\r\n      <AutoGen>True</AutoGen>\r\n      <DependentUpon>Resources.resx</DependentUpon>\r\n    </Compile>\r\n    <None Include=\"packages.config\" />\r\n    <None Include=\"Properties\\Settings.settings\">\r\n      <Generator>SettingsSingleFileGenerator</Generator>\r\n      <LastGenOutput>Settings.Designer.cs</LastGenOutput>\r\n    </None>\r\n    <Compile Include=\"Properties\\Settings.Designer.cs\">\r\n      <AutoGen>True</AutoGen>\r\n      <DependentUpon>Settings.settings</DependentUpon>\r\n      <DesignTimeSharedInput>True</DesignTimeSharedInput>\r\n    </Compile>\r\n    <None Include=\"ООП курсовая работа.docx\" />\r\n  </ItemGroup>\r\n  <ItemGroup>\r\n    <None Include=\"App.config\" />\r\n  </ItemGroup>\r\n  <ItemGroup>\r\n    <Content Include=\"file.txt\" />\r\n  </ItemGroup>\r\n  <Import Project=\"$(MSBuildToolsPath)\\Microsoft.CSharp.targets\" />\r\n</Project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/OOP_Cource/OOP_Cource.csproj b/OOP_Cource/OOP_Cource.csproj
+--- a/OOP_Cource/OOP_Cource.csproj	(revision 45d61d08c56250facdd10963455261d6a3dd6eca)
++++ b/OOP_Cource/OOP_Cource.csproj	(date 1779026547976)
+@@ -41,10 +41,14 @@
+     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=9.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.9.0.1\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+     </Reference>
++    <Reference Include="Npgsql, Version=4.1.14.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
++      <HintPath>..\packages\Npgsql.4.1.14\lib\net461\Npgsql.dll</HintPath>
++    </Reference>
+     <Reference Include="System">
+       <HintPath>..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8.1\System.dll</HintPath>
+     </Reference>
+     <Reference Include="System.Core" />
++    <Reference Include="System.Configuration" />
+     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+     </Reference>
+@@ -67,7 +71,7 @@
+       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.6.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+     </Reference>
+     <Reference Include="System.Text.Encodings.Web">
+-      <HintPath>..\packages\System.Text.Encodings.Web.4.6.0\lib\netstandard2.0\System.Text.Encodings.Web.dll</HintPath>
++      <HintPath>..\packages\System.Text.Encodings.Web.4.7.2\lib\netstandard2.0\System.Text.Encodings.Web.dll</HintPath>
+     </Reference>
+     <Reference Include="System.Text.Json">
+       <HintPath>..\packages\System.Text.Json.4.6.0\lib\net461\System.Text.Json.dll</HintPath>
+@@ -175,4 +179,4 @@
+     <Content Include="file.txt" />
+   </ItemGroup>
+   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+-</Project>
+\ No newline at end of file
++</Project>

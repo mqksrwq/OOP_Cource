@@ -6,14 +6,27 @@ using OOP_Cource.Utils;
 
 namespace OOP_Cource.View.Controls
 {
+    /// <summary>
+    /// Элемент управления для добавления нового транспортного средства
+    /// </summary>
     public partial class AddVehicleControl : UserControl
     {
         private readonly VehicleController _controller;
         private DistrictEnum _district;
 
+        /// <summary>
+        /// Событие успешного добавления транспортного средства
+        /// </summary>
         public event Action AddButtonEvent;
+
+        /// <summary>
+        /// Событие нажатия кнопки возврата без добавления
+        /// </summary>
         public event Action BackButtonEvent;
 
+        /// <summary>
+        /// Инициализирует элемент управления и устанавливает начальный статус
+        /// </summary>
         public AddVehicleControl(VehicleController controller)
         {
             InitializeComponent();
@@ -21,12 +34,18 @@ namespace OOP_Cource.View.Controls
             StatusComboBox.SelectedIndex = 0;
         }
 
+        /// <summary>
+        /// Устанавливает выбранный район и отображает его в поле ввода
+        /// </summary>
         public void SetDistrict(DistrictEnum district)
         {
             _district = district;
             DistrictTextBox.Text = DistrictExtension.GetDisplayName(district);
         }
 
+        /// <summary>
+        /// Валидирует поля, отправляет запрос на добавление транспорта и вызывает событие успеха
+        /// </summary>
         private async void AddButton_Click(object sender, EventArgs e)
         {
             try
@@ -50,6 +69,9 @@ namespace OOP_Cource.View.Controls
             }
         }
 
+        /// <summary>
+        /// Вызывает событие возврата без сохранения
+        /// </summary>
         private void BackButton_Click(object sender, EventArgs e)
         {
             BackButtonEvent?.Invoke();

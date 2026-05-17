@@ -8,6 +8,9 @@ namespace OOP_Cource.Utils
     /// </summary>
     public static class Validator
     {
+        /// <summary>
+        /// Проверяет корректность гос. номера транспортного средства
+        /// </summary>
         public static void ValidateNumber(string number)
         {
             if (string.IsNullOrWhiteSpace(number))
@@ -23,6 +26,9 @@ namespace OOP_Cource.Utils
                 throw new ArgumentException("Гос. номер содержит недопустимые символы");
         }
 
+        /// <summary>
+        /// Проверяет корректность названия района
+        /// </summary>
         public static void ValidateDistrict(string district)
         {
             if (string.IsNullOrWhiteSpace(district))
@@ -32,6 +38,9 @@ namespace OOP_Cource.Utils
                 throw new ArgumentException("Район движения должен содержать минимум 2 символа");
         }
 
+        /// <summary>
+        /// Проверяет корректность названия модели транспортного средства
+        /// </summary>
         public static void ValidateModel(string model)
         {
             if (string.IsNullOrWhiteSpace(model))
@@ -41,6 +50,9 @@ namespace OOP_Cource.Utils
                 throw new ArgumentException("Модель должна содержать минимум 2 символа");
         }
 
+        /// <summary>
+        /// Проверяет корректность значения вместимости транспортного средства
+        /// </summary>
         public static void ValidateCapacity(int capacity)
         {
             if (capacity <= 0)
@@ -50,12 +62,18 @@ namespace OOP_Cource.Utils
                 throw new ArgumentException("Вместимость не может превышать 200 мест");
         }
 
+        /// <summary>
+        /// Проверяет корректность статуса транспортного средства
+        /// </summary>
         public static void ValidateStatus(string status)
         {
             if (string.IsNullOrWhiteSpace(status))
                 throw new ArgumentException("Статус не может быть пустым");
         }
 
+        /// <summary>
+        /// Выполняет полную валидацию всех полей транспортного средства
+        /// </summary>
         public static void ValidateVehicle(string number, string district, string model, int capacity, string status)
         {
             ValidateNumber(number);

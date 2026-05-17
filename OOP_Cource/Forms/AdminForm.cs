@@ -7,7 +7,7 @@ using OOP_Cource.View.Controls;
 namespace OOP_Cource.Forms
 {
     /// <summary>
-    /// Форма администратора для управления транспортом
+    /// Главная форма администратора для управления транспортным парком
     /// </summary>
     public partial class AdminForm : Form
     {
@@ -16,6 +16,9 @@ namespace OOP_Cource.Forms
         private AddVehicleControl _addControl;
         private EditVehicleControl _editControl;
 
+        /// <summary>
+        /// Инициализирует форму, показывает приветственный экран и создаёт все элементы управления
+        /// </summary>
         public AdminForm()
         {
             InitializeComponent();
@@ -32,18 +35,27 @@ namespace OOP_Cource.Forms
             _control.CloseFormRequest += OnCloseFormRequest;
         }
 
+        /// <summary>
+        /// Добавляет главный элемент управления на форму при загрузке
+        /// </summary>
         private void AdminForm_Load(object sender, EventArgs e)
         {
             _control.Dock = DockStyle.Fill;
             Controls.Add(_control);
         }
 
+        /// <summary>
+        /// Отображает приветственную форму в модальном режиме
+        /// </summary>
         private void ShowHelloForm()
         {
             using var helloForm = new HelloForm();
             helloForm.ShowDialog();
         }
 
+        /// <summary>
+        /// Переключает вид на форму добавления транспорта выбранного района
+        /// </summary>
         private void OnAddVehicleRequested(DistrictEnum district)
         {
             Controls.Remove(_control);
@@ -68,6 +80,9 @@ namespace OOP_Cource.Forms
             };
         }
 
+        /// <summary>
+        /// Переключает вид на форму редактирования выбранного транспорта
+        /// </summary>
         private async System.Threading.Tasks.Task OnEditVehicleRequest(int id)
         {
             Controls.Remove(_control);
@@ -91,6 +106,9 @@ namespace OOP_Cource.Forms
             };
         }
 
+        /// <summary>
+        /// Завершает работу приложения при получении запроса закрытия
+        /// </summary>
         private void OnCloseFormRequest()
         {
             foreach (var control in Controls)

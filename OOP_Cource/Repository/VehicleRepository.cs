@@ -1,212 +1,262 @@
+using Npgsql;
 using OOP_Cource.Config;
 using OOP_Cource.Models;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace OOP_Cource.Repository
 {
+    /// <summary>
+    /// Репозиторий транспорта с хранением данных в PostgreSQL
+    /// </summary>
     public class VehicleRepository : IVehicleRepository
     {
-        private static readonly object StorageLock = new object();
-        private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
-        {
-            WriteIndented = true
-        };
+        private readonly string _connectionString;
 
-        private readonly string _databasePath;
-
+        /// <summary>
+        /// Инициализирует репозиторий и создаёт базу данных с таблицей при первом запуске
+        /// </summary>
         public VehicleRepository()
         {
-            _databasePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppConfig.LocalDatabasePath);
-            EnsureStorageCreated();
+            _connectionString = AppConfig.ConnectionString;
+            EnsureCreated();
         }
 
-        public Task<IEnumerable<Vehicle>> GetAllAsync()
+        /// <summary>
+        /// Создаёт базу данных vehicles_db и таблицу vehicles, если они не существуют
+        /// </summary>
+        private void EnsureCreated()
         {
-            return Task.FromResult<IEnumerable<Vehicle>>(ReadVehicles());
-        }
+            using var masterConn = new NpgsqlConnection(AppConfig.MasterConnectionString);
+            masterConn.Open();
 
-        public Task<Vehicle> GetByIdAsync(int id)
-        {
-            var vehicle = ReadVehicles().FirstOrDefault(item => item.Id == id);
-            return Task.FromResult(vehicle);
-        }
+            using var checkCmd = new NpgsqlCommand(
+                "SELECT 1 FROM pg_database WHERE datname = 'vehicles_db'", masterConn);
+            var dbExists = checkCmd.ExecuteScalar() != null;
 
-        public Task<IEnumerable<Vehicle>> GetByNumberAsync(string number)
-        {
-            var vehicles = ReadVehicles()
-                .Where(vehicle => ContainsIgnoreCase(vehicle.Number, number))
-                .ToList();
-
-            return Task.FromResult<IEnumerable<Vehicle>>(vehicles);
-        }
-
-        public Task<IEnumerable<Vehicle>> GetByDistrictAsync(string district)
-        {
-            var vehicles = ReadVehicles()
-                .Where(vehicle => ContainsIgnoreCase(vehicle.District, district))
-                .ToList();
-
-            return Task.FromResult<IEnumerable<Vehicle>>(vehicles);
-        }
-
-        public Task<IEnumerable<Vehicle>> GetByModelAsync(string model)
-        {
-            var vehicles = ReadVehicles()
-                .Where(vehicle => ContainsIgnoreCase(vehicle.Model, model))
-                .ToList();
-
-            return Task.FromResult<IEnumerable<Vehicle>>(vehicles);
-        }
-
-        public Task<IEnumerable<Vehicle>> GetByCapacityAsync(int capacity)
-        {
-            var vehicles = ReadVehicles()
-                .Where(vehicle => vehicle.Capacity == capacity)
-                .ToList();
-
-            return Task.FromResult<IEnumerable<Vehicle>>(vehicles);
-        }
-
-        public Task<IEnumerable<Vehicle>> GetByStatusAsync(string status)
-        {
-            var vehicles = ReadVehicles()
-                .Where(vehicle => ContainsIgnoreCase(vehicle.Status, status))
-                .ToList();
-
-            return Task.FromResult<IEnumerable<Vehicle>>(vehicles);
-        }
-
-        public Task AddAsync(Vehicle newVehicle)
-        {
-            lock (StorageLock)
+            if (!dbExists)
             {
-                var vehicles = ReadVehiclesUnsafe();
-                newVehicle.Id = GetNextId(vehicles);
-                vehicles.Add(newVehicle);
-                WriteVehiclesUnsafe(vehicles);
+                using var createDbCmd = new NpgsqlCommand("CREATE DATABASE vehicles_db", masterConn);
+                createDbCmd.ExecuteNonQuery();
             }
 
-            return Task.CompletedTask;
+            masterConn.Close();
+
+            using var conn = new NpgsqlConnection(_connectionString);
+            conn.Open();
+
+            using var tableCmd = new NpgsqlCommand(@"
+                CREATE TABLE IF NOT EXISTS vehicles (
+                    id       SERIAL       PRIMARY KEY,
+                    number   VARCHAR(20)  NOT NULL,
+                    district VARCHAR(100) NOT NULL,
+                    model    VARCHAR(100) NOT NULL,
+                    capacity INTEGER      NOT NULL,
+                    status   VARCHAR(50)  NOT NULL
+                )", conn);
+            tableCmd.ExecuteNonQuery();
         }
 
-        public Task UpdateAsync(Vehicle editVehicle)
+        /// <summary>
+        /// Считывает объект Vehicle из текущей строки результата запроса
+        /// </summary>
+        private static Vehicle ReadVehicle(NpgsqlDataReader reader)
         {
-            lock (StorageLock)
+            return new Vehicle
             {
-                var vehicles = ReadVehiclesUnsafe();
-                var vehicle = vehicles.FirstOrDefault(item => item.Id == editVehicle.Id);
-                if (vehicle != null)
-                {
-                    vehicle.Number = editVehicle.Number;
-                    vehicle.District = editVehicle.District;
-                    vehicle.Model = editVehicle.Model;
-                    vehicle.Capacity = editVehicle.Capacity;
-                    vehicle.Status = editVehicle.Status;
-                    WriteVehiclesUnsafe(vehicles);
-                }
-            }
-
-            return Task.CompletedTask;
+                Id       = reader.GetInt32(0),
+                Number   = reader.GetString(1),
+                District = reader.GetString(2),
+                Model    = reader.GetString(3),
+                Capacity = reader.GetInt32(4),
+                Status   = reader.GetString(5)
+            };
         }
 
-        public Task DeleteAsync(int id)
+        /// <summary>
+        /// Возвращает все записи транспорта из базы данных
+        /// </summary>
+        public async Task<IEnumerable<Vehicle>> GetAllAsync()
         {
-            lock (StorageLock)
-            {
-                var vehicles = ReadVehiclesUnsafe();
-                vehicles.RemoveAll(vehicle => vehicle.Id == id);
-                WriteVehiclesUnsafe(vehicles);
-            }
-
-            return Task.CompletedTask;
+            var vehicles = new List<Vehicle>();
+            await using var conn = new NpgsqlConnection(_connectionString);
+            await conn.OpenAsync();
+            await using var cmd = new NpgsqlCommand(
+                "SELECT id, number, district, model, capacity, status FROM vehicles ORDER BY id", conn);
+            await using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+                vehicles.Add(ReadVehicle(reader));
+            return vehicles;
         }
 
-        public Task DeleteAllAsync()
+        /// <summary>
+        /// Возвращает транспорт по идентификатору или null, если не найден
+        /// </summary>
+        public async Task<Vehicle> GetByIdAsync(int id)
         {
-            lock (StorageLock)
-            {
-                WriteVehiclesUnsafe(new List<Vehicle>());
-            }
-
-            return Task.CompletedTask;
+            await using var conn = new NpgsqlConnection(_connectionString);
+            await conn.OpenAsync();
+            await using var cmd = new NpgsqlCommand(
+                "SELECT id, number, district, model, capacity, status FROM vehicles WHERE id = @id", conn);
+            cmd.Parameters.AddWithValue("id", id);
+            await using var reader = await cmd.ExecuteReaderAsync();
+            return await reader.ReadAsync() ? ReadVehicle(reader) : null;
         }
 
-        public Task DeleteByDistrictAsync(string district)
+        /// <summary>
+        /// Возвращает транспорт по вхождению гос. номера без учёта регистра
+        /// </summary>
+        public async Task<IEnumerable<Vehicle>> GetByNumberAsync(string number)
         {
-            lock (StorageLock)
-            {
-                var vehicles = ReadVehiclesUnsafe();
-                vehicles.RemoveAll(vehicle => string.Equals(vehicle.District, district, StringComparison.OrdinalIgnoreCase));
-                WriteVehiclesUnsafe(vehicles);
-            }
-
-            return Task.CompletedTask;
+            var vehicles = new List<Vehicle>();
+            await using var conn = new NpgsqlConnection(_connectionString);
+            await conn.OpenAsync();
+            await using var cmd = new NpgsqlCommand(
+                "SELECT id, number, district, model, capacity, status FROM vehicles WHERE number ILIKE @val ORDER BY id", conn);
+            cmd.Parameters.AddWithValue("val", "%" + number + "%");
+            await using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+                vehicles.Add(ReadVehicle(reader));
+            return vehicles;
         }
 
-        private void EnsureStorageCreated()
+        /// <summary>
+        /// Возвращает транспорт по вхождению названия района без учёта регистра
+        /// </summary>
+        public async Task<IEnumerable<Vehicle>> GetByDistrictAsync(string district)
         {
-            lock (StorageLock)
-            {
-                var directory = Path.GetDirectoryName(_databasePath);
-                if (!string.IsNullOrEmpty(directory))
-                    Directory.CreateDirectory(directory);
-
-                if (!File.Exists(_databasePath))
-                    WriteVehiclesUnsafe(new List<Vehicle>());
-            }
+            var vehicles = new List<Vehicle>();
+            await using var conn = new NpgsqlConnection(_connectionString);
+            await conn.OpenAsync();
+            await using var cmd = new NpgsqlCommand(
+                "SELECT id, number, district, model, capacity, status FROM vehicles WHERE district ILIKE @val ORDER BY id", conn);
+            cmd.Parameters.AddWithValue("val", "%" + district + "%");
+            await using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+                vehicles.Add(ReadVehicle(reader));
+            return vehicles;
         }
 
-        private List<Vehicle> ReadVehicles()
+        /// <summary>
+        /// Возвращает транспорт по вхождению названия модели без учёта регистра
+        /// </summary>
+        public async Task<IEnumerable<Vehicle>> GetByModelAsync(string model)
         {
-            lock (StorageLock)
-            {
-                return ReadVehiclesUnsafe();
-            }
+            var vehicles = new List<Vehicle>();
+            await using var conn = new NpgsqlConnection(_connectionString);
+            await conn.OpenAsync();
+            await using var cmd = new NpgsqlCommand(
+                "SELECT id, number, district, model, capacity, status FROM vehicles WHERE model ILIKE @val ORDER BY id", conn);
+            cmd.Parameters.AddWithValue("val", "%" + model + "%");
+            await using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+                vehicles.Add(ReadVehicle(reader));
+            return vehicles;
         }
 
-        private List<Vehicle> ReadVehiclesUnsafe()
+        /// <summary>
+        /// Возвращает транспорт с указанной вместимостью
+        /// </summary>
+        public async Task<IEnumerable<Vehicle>> GetByCapacityAsync(int capacity)
         {
-            if (!File.Exists(_databasePath))
-                return new List<Vehicle>();
-
-            var json = File.ReadAllText(_databasePath);
-            if (string.IsNullOrWhiteSpace(json))
-                return new List<Vehicle>();
-
-            try
-            {
-                return JsonSerializer.Deserialize<List<Vehicle>>(json) ?? new List<Vehicle>();
-            }
-            catch (JsonException)
-            {
-                return new List<Vehicle>();
-            }
+            var vehicles = new List<Vehicle>();
+            await using var conn = new NpgsqlConnection(_connectionString);
+            await conn.OpenAsync();
+            await using var cmd = new NpgsqlCommand(
+                "SELECT id, number, district, model, capacity, status FROM vehicles WHERE capacity = @capacity ORDER BY id", conn);
+            cmd.Parameters.AddWithValue("capacity", capacity);
+            await using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+                vehicles.Add(ReadVehicle(reader));
+            return vehicles;
         }
 
-        private void WriteVehiclesUnsafe(List<Vehicle> vehicles)
+        /// <summary>
+        /// Возвращает транспорт по вхождению статуса без учёта регистра
+        /// </summary>
+        public async Task<IEnumerable<Vehicle>> GetByStatusAsync(string status)
         {
-            var json = JsonSerializer.Serialize(vehicles, JsonOptions);
-            File.WriteAllText(_databasePath, json);
+            var vehicles = new List<Vehicle>();
+            await using var conn = new NpgsqlConnection(_connectionString);
+            await conn.OpenAsync();
+            await using var cmd = new NpgsqlCommand(
+                "SELECT id, number, district, model, capacity, status FROM vehicles WHERE status ILIKE @val ORDER BY id", conn);
+            cmd.Parameters.AddWithValue("val", "%" + status + "%");
+            await using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+                vehicles.Add(ReadVehicle(reader));
+            return vehicles;
         }
 
-        private static int GetNextId(IEnumerable<Vehicle> vehicles)
+        /// <summary>
+        /// Добавляет новый транспорт в базу данных и присваивает ему сгенерированный id
+        /// </summary>
+        public async Task AddAsync(Vehicle newVehicle)
         {
-            return vehicles.Any()
-                ? vehicles.Max(vehicle => vehicle.Id) + 1
-                : 1;
+            await using var conn = new NpgsqlConnection(_connectionString);
+            await conn.OpenAsync();
+            await using var cmd = new NpgsqlCommand(
+                "INSERT INTO vehicles (number, district, model, capacity, status) VALUES (@number, @district, @model, @capacity, @status) RETURNING id", conn);
+            cmd.Parameters.AddWithValue("number",   newVehicle.Number);
+            cmd.Parameters.AddWithValue("district", newVehicle.District);
+            cmd.Parameters.AddWithValue("model",    newVehicle.Model);
+            cmd.Parameters.AddWithValue("capacity", newVehicle.Capacity);
+            cmd.Parameters.AddWithValue("status",   newVehicle.Status);
+            newVehicle.Id = (int)await cmd.ExecuteScalarAsync();
         }
 
-        private static bool ContainsIgnoreCase(string source, string value)
+        /// <summary>
+        /// Обновляет данные транспорта в базе данных
+        /// </summary>
+        public async Task UpdateAsync(Vehicle editVehicle)
         {
-            if (string.IsNullOrEmpty(value))
-                return true;
+            await using var conn = new NpgsqlConnection(_connectionString);
+            await conn.OpenAsync();
+            await using var cmd = new NpgsqlCommand(
+                "UPDATE vehicles SET number = @number, district = @district, model = @model, capacity = @capacity, status = @status WHERE id = @id", conn);
+            cmd.Parameters.AddWithValue("id",       editVehicle.Id);
+            cmd.Parameters.AddWithValue("number",   editVehicle.Number);
+            cmd.Parameters.AddWithValue("district", editVehicle.District);
+            cmd.Parameters.AddWithValue("model",    editVehicle.Model);
+            cmd.Parameters.AddWithValue("capacity", editVehicle.Capacity);
+            cmd.Parameters.AddWithValue("status",   editVehicle.Status);
+            await cmd.ExecuteNonQueryAsync();
+        }
 
-            return source != null && source.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0;
+        /// <summary>
+        /// Удаляет транспорт по идентификатору
+        /// </summary>
+        public async Task DeleteAsync(int id)
+        {
+            await using var conn = new NpgsqlConnection(_connectionString);
+            await conn.OpenAsync();
+            await using var cmd = new NpgsqlCommand("DELETE FROM vehicles WHERE id = @id", conn);
+            cmd.Parameters.AddWithValue("id", id);
+            await cmd.ExecuteNonQueryAsync();
+        }
+
+        /// <summary>
+        /// Удаляет все записи транспорта из базы данных
+        /// </summary>
+        public async Task DeleteAllAsync()
+        {
+            await using var conn = new NpgsqlConnection(_connectionString);
+            await conn.OpenAsync();
+            await using var cmd = new NpgsqlCommand("DELETE FROM vehicles", conn);
+            await cmd.ExecuteNonQueryAsync();
+        }
+
+        /// <summary>
+        /// Удаляет все записи транспорта по названию района без учёта регистра
+        /// </summary>
+        public async Task DeleteByDistrictAsync(string district)
+        {
+            await using var conn = new NpgsqlConnection(_connectionString);
+            await conn.OpenAsync();
+            await using var cmd = new NpgsqlCommand(
+                "DELETE FROM vehicles WHERE LOWER(district) = LOWER(@district)", conn);
+            cmd.Parameters.AddWithValue("district", district);
+            await cmd.ExecuteNonQueryAsync();
         }
     }
 }

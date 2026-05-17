@@ -10,6 +10,9 @@ using OOP_Cource.Models;
 
 namespace OOP_Cource.Forms
 {
+    /// <summary>
+    /// Форма управления транспортом, маршрутами, водителями и финансовыми операциями
+    /// </summary>
     public class MainForm : Form
     {
         private readonly BindingList<Vehicle> _vehicles = new BindingList<Vehicle>();
@@ -52,12 +55,18 @@ namespace OOP_Cource.Forms
         private DataGridView dgvDrivers;
         private DataGridView dgvOperations;
 
+        /// <summary>
+        /// Инициализирует форму и обновляет список транспорта для выбора водителей
+        /// </summary>
         public MainForm()
         {
             InitializeMainForm();
             RefreshVehicleSelectors();
         }
 
+        /// <summary>
+        /// Создаёт вкладки и настраивает параметры главного окна
+        /// </summary>
         private void InitializeMainForm()
         {
             Text = "Учет автобусного парка";
@@ -76,6 +85,9 @@ namespace OOP_Cource.Forms
             Controls.Add(tabControl);
         }
 
+        /// <summary>
+        /// Создаёт вкладку управления транспортными средствами
+        /// </summary>
         private TabPage CreateVehiclesTab()
         {
             var page = new TabPage("Транспорт");
@@ -110,6 +122,9 @@ namespace OOP_Cource.Forms
             return page;
         }
 
+        /// <summary>
+        /// Создаёт вкладку управления маршрутами
+        /// </summary>
         private TabPage CreateRoutesTab()
         {
             var page = new TabPage("Маршруты");
@@ -144,6 +159,9 @@ namespace OOP_Cource.Forms
             return page;
         }
 
+        /// <summary>
+        /// Создаёт вкладку управления водителями
+        /// </summary>
         private TabPage CreateDriversTab()
         {
             var page = new TabPage("Водители");
@@ -174,6 +192,9 @@ namespace OOP_Cource.Forms
             return page;
         }
 
+        /// <summary>
+        /// Создаёт вкладку учёта доходов и расходов
+        /// </summary>
         private TabPage CreateFinanceTab()
         {
             var page = new TabPage("Доходы/Расходы");
@@ -210,6 +231,9 @@ namespace OOP_Cource.Forms
             return page;
         }
 
+        /// <summary>
+        /// Создаёт вкладку формирования финансовых отчётов
+        /// </summary>
         private TabPage CreateReportsTab()
         {
             var page = new TabPage("Отчеты");
@@ -245,6 +269,9 @@ namespace OOP_Cource.Forms
             return page;
         }
 
+        /// <summary>
+        /// Создаёт горизонтальный контейнер разделения панелей для вкладки
+        /// </summary>
         private static SplitContainer CreateSplitContainer(TabPage page, int panel1Height = 250)
         {
             var split = new SplitContainer
@@ -259,6 +286,9 @@ namespace OOP_Cource.Forms
             return split;
         }
 
+        /// <summary>
+        /// Создаёт панель для вертикального размещения полей ввода
+        /// </summary>
         private static FlowLayoutPanel CreateFlowPanel()
         {
             return new FlowLayoutPanel
@@ -271,6 +301,9 @@ namespace OOP_Cource.Forms
             };
         }
 
+        /// <summary>
+        /// Создаёт строку с подписью и элементом ввода
+        /// </summary>
         private static Panel CreateInputRow(string labelText, Control control)
         {
             var row = new Panel
@@ -295,6 +328,9 @@ namespace OOP_Cource.Forms
             return row;
         }
 
+        /// <summary>
+        /// Создаёт строку с выровненной кнопкой действия
+        /// </summary>
         private static Panel CreateButtonRow(Button button)
         {
             var row = new Panel
@@ -309,11 +345,17 @@ namespace OOP_Cource.Forms
             return row;
         }
 
+        /// <summary>
+        /// Создаёт текстовое поле ввода с указанной шириной
+        /// </summary>
         private static TextBox CreateTextBox(int width)
         {
             return new TextBox { Width = width };
         }
 
+        /// <summary>
+        /// Создаёт таблицу данных с базовыми настройками отображения
+        /// </summary>
         private static DataGridView CreateGrid()
         {
             return new DataGridView
@@ -329,6 +371,9 @@ namespace OOP_Cource.Forms
             };
         }
 
+        /// <summary>
+        /// Динамически подстраивает высоту верхней панели контейнера при изменении размера формы
+        /// </summary>
         private static void ConfigureSplitLayout(SplitContainer split, FlowLayoutPanel inputPanel, int minHeight)
         {
             Action applyLayout = () =>
@@ -358,6 +403,9 @@ namespace OOP_Cource.Forms
             applyLayout();
         }
 
+        /// <summary>
+        /// Создаёт прокручиваемый контейнер с таблицей, подстраивающей высоту под количество строк
+        /// </summary>
         private static Panel CreateDynamicGridHost(DataGridView grid)
         {
             var host = new Panel
@@ -390,6 +438,9 @@ namespace OOP_Cource.Forms
             return host;
         }
 
+        /// <summary>
+        /// Добавляет новое транспортное средство в список при нажатии кнопки
+        /// </summary>
         private void BtnAddVehicle_Click(object sender, EventArgs e)
         {
             int capacity;
@@ -423,6 +474,9 @@ namespace OOP_Cource.Forms
             RefreshVehicleSelectors();
         }
 
+        /// <summary>
+        /// Добавляет новый маршрут в список при нажатии кнопки
+        /// </summary>
         private void BtnAddRoute_Click(object sender, EventArgs e)
         {
             decimal distance;
@@ -454,6 +508,9 @@ namespace OOP_Cource.Forms
             txtRouteFare.Clear();
         }
 
+        /// <summary>
+        /// Добавляет нового водителя в список при нажатии кнопки
+        /// </summary>
         private void BtnAddDriver_Click(object sender, EventArgs e)
         {
             var selectedVehicle = cmbDriverVehicle.SelectedItem as VehicleSelector;
@@ -484,6 +541,9 @@ namespace OOP_Cource.Forms
             txtDriverLicense.Clear();
         }
 
+        /// <summary>
+        /// Добавляет новую финансовую операцию в список при нажатии кнопки
+        /// </summary>
         private void BtnAddOperation_Click(object sender, EventArgs e)
         {
             decimal amount;
@@ -509,6 +569,9 @@ namespace OOP_Cource.Forms
             txtOperationComment.Clear();
         }
 
+        /// <summary>
+        /// Удаляет выбранное транспортное средство из списка при нажатии кнопки
+        /// </summary>
         private void BtnDeleteVehicle_Click(object sender, EventArgs e)
         {
             var selectedVehicle = dgvVehicles.CurrentRow != null ? dgvVehicles.CurrentRow.DataBoundItem as Vehicle : null;
@@ -529,6 +592,9 @@ namespace OOP_Cource.Forms
             RefreshVehicleSelectors();
         }
 
+        /// <summary>
+        /// Удаляет выбранный маршрут из списка при нажатии кнопки
+        /// </summary>
         private void BtnDeleteRoute_Click(object sender, EventArgs e)
         {
             var selectedRoute = dgvRoutes.CurrentRow != null ? dgvRoutes.CurrentRow.DataBoundItem as Route : null;
@@ -541,6 +607,9 @@ namespace OOP_Cource.Forms
             _routes.Remove(selectedRoute);
         }
 
+        /// <summary>
+        /// Удаляет выбранного водителя из списка при нажатии кнопки
+        /// </summary>
         private void BtnDeleteDriver_Click(object sender, EventArgs e)
         {
             var selectedDriver = dgvDrivers.CurrentRow != null ? dgvDrivers.CurrentRow.DataBoundItem as Driver : null;
@@ -553,6 +622,9 @@ namespace OOP_Cource.Forms
             _drivers.Remove(selectedDriver);
         }
 
+        /// <summary>
+        /// Удаляет выбранную финансовую операцию из списка при нажатии кнопки
+        /// </summary>
         private void BtnDeleteOperation_Click(object sender, EventArgs e)
         {
             var selectedOperation = dgvOperations.CurrentRow != null ? dgvOperations.CurrentRow.DataBoundItem as FinanceOperation : null;
@@ -565,6 +637,9 @@ namespace OOP_Cource.Forms
             _operations.Remove(selectedOperation);
         }
 
+        /// <summary>
+        /// Формирует и отображает сводный финансовый отчёт за выбранный период
+        /// </summary>
         private void BtnSummaryReport_Click(object sender, EventArgs e)
         {
             var filtered = GetOperationsByPeriod();
@@ -587,6 +662,9 @@ namespace OOP_Cource.Forms
             txtReport.Text = report.ToString();
         }
 
+        /// <summary>
+        /// Формирует и отображает отчёт по категориям финансовых операций за выбранный период
+        /// </summary>
         private void BtnCategoryReport_Click(object sender, EventArgs e)
         {
             var filtered = GetOperationsByPeriod();
@@ -616,6 +694,9 @@ namespace OOP_Cource.Forms
             txtReport.Text = report.ToString();
         }
 
+        /// <summary>
+        /// Возвращает список финансовых операций за выбранный период дат
+        /// </summary>
         private List<FinanceOperation> GetOperationsByPeriod()
         {
             var from = dtReportFrom.Value.Date;
@@ -630,6 +711,9 @@ namespace OOP_Cource.Forms
             return _operations.Where(x => x.Date.Date >= from && x.Date.Date <= to).ToList();
         }
 
+        /// <summary>
+        /// Обновляет выпадающий список транспорта для назначения водителям
+        /// </summary>
         private void RefreshVehicleSelectors()
         {
             var items = _vehicles

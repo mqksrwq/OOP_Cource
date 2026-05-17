@@ -12,15 +12,32 @@ using OOP_Cource.Utils;
 
 namespace OOP_Cource.View.Controls
 {
+    /// <summary>
+    /// Элемент управления таблицей транспорта одного района с поиском и отчётами
+    /// </summary>
     public partial class AdminDistrictControl : UserControl
     {
         private readonly VehicleController _controller;
         private readonly DistrictEnum _district;
 
+        /// <summary>
+        /// Событие запроса добавления транспорта в текущий район
+        /// </summary>
         public event Action<DistrictEnum> AddButtonEvent;
+
+        /// <summary>
+        /// Событие запроса редактирования транспорта по идентификатору
+        /// </summary>
         public event Action<int> ChangeButtonEvent;
+
+        /// <summary>
+        /// Событие запроса закрытия формы
+        /// </summary>
         public event Action CloseButtonEvent;
 
+        /// <summary>
+        /// Инициализирует элемент управления для указанного района и настраивает таблицу
+        /// </summary>
         public AdminDistrictControl(VehicleController controller, DistrictEnum district)
         {
             InitializeComponent();
@@ -29,22 +46,34 @@ namespace OOP_Cource.View.Controls
             ConfigureVehicleGrid();
         }
 
+        /// <summary>
+        /// Загружает транспорт текущего района при первом отображении элемента управления
+        /// </summary>
         private async void AdminDistrictControl_Load(object sender, EventArgs e)
         {
             await LoadAllVehiclesAsync();
         }
 
+        /// <summary>
+        /// Запрашивает все транспортные средства текущего района и отображает их в таблице
+        /// </summary>
         private async Task LoadAllVehiclesAsync()
         {
             var vehicles = await _controller.GetByDistrictAsync(GetCurrentDistrictName());
             LoadVehiclesByList(vehicles);
         }
 
+        /// <summary>
+        /// Возвращает отображаемое имя текущего района
+        /// </summary>
         private string GetCurrentDistrictName()
         {
             return DistrictExtension.GetDisplayName(_district);
         }
 
+        /// <summary>
+        /// Добавляет колонки в таблицу транспорта, если они ещё не созданы
+        /// </summary>
         private void ConfigureVehicleGrid()
         {
             if (VehicleDataGridView.Columns.Count > 0)
@@ -76,6 +105,9 @@ namespace OOP_Cource.View.Controls
             });
         }
 
+        /// <summary>
+        /// Заполняет таблицу строками из переданного списка транспортных средств
+        /// </summary>
         private void LoadVehiclesByList(List<VehicleDTO> vehicles)
         {
             VehicleDataGridView.Rows.Clear();
@@ -94,6 +126,9 @@ namespace OOP_Cource.View.Controls
             }
         }
 
+        /// <summary>
+        /// Выполняет поиск по выбранному критерию и отображает результаты в таблице
+        /// </summary>
         private async void SearchButton_Click(object sender, EventArgs e)
         {
             try
@@ -138,6 +173,9 @@ namespace OOP_Cource.View.Controls
             }
         }
 
+        /// <summary>
+        /// Сбрасывает фильтр поиска и перезагружает все транспортные средства района
+        /// </summary>
         private async void ClearButton_Click(object sender, EventArgs e)
         {
             CriteriaComboBox.SelectedItem = null;
@@ -145,12 +183,18 @@ namespace OOP_Cource.View.Controls
             await LoadAllVehiclesAsync();
         }
 
+        /// <summary>
+        /// Фильтрует список транспорта, оставляя только записи текущего района
+        /// </summary>
         private List<VehicleDTO> FilterCurrentDistrict(List<VehicleDTO> vehicles)
         {
             var district = GetCurrentDistrictName();
             return vehicles.Where(vehicle => vehicle.District == district).ToList();
         }
 
+        /// <summary>
+        /// Обрабатывает клики по кнопкам редактирования и удаления в строках таблицы
+        /// </summary>
         private async void VehicleDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             try
@@ -181,11 +225,17 @@ namespace OOP_Cource.View.Controls
             }
         }
 
+        /// <summary>
+        /// Вызывает событие добавления транспорта для текущего района
+        /// </summary>
         private void AddButton_Click(object sender, EventArgs e)
         {
             AddButtonEvent?.Invoke(_district);
         }
 
+        /// <summary>
+        /// Удаляет все записи транспорта текущего района после подтверждения пользователя
+        /// </summary>
         private async void DeleteAllButton_Click(object sender, EventArgs e)
         {
             var result = MessageBox.Show("Вы действительно хотите удалить все записи по району?",
@@ -201,11 +251,17 @@ namespace OOP_Cource.View.Controls
             }
         }
 
+        /// <summary>
+        /// Вызывает событие закрытия формы
+        /// </summary>
         private void BackButton_Click(object sender, EventArgs e)
         {
             CloseButtonEvent?.Invoke();
         }
 
+        /// <summary>
+        /// Формирует и сохраняет текстовый отчёт по транспорту текущего района
+        /// </summary>
         private async void ReportButton_Click(object sender, EventArgs e)
         {
             try
@@ -229,6 +285,9 @@ namespace OOP_Cource.View.Controls
             }
         }
 
+        /// <summary>
+        /// Формирует и сохраняет CSV-файл по транспорту текущего района
+        /// </summary>
         private async void CsvButton_Click(object sender, EventArgs e)
         {
             try
@@ -252,6 +311,9 @@ namespace OOP_Cource.View.Controls
             }
         }
 
+        /// <summary>
+        /// Формирует текстовый отчёт по списку транспортных средств
+        /// </summary>
         private string CreateReport(List<VehicleDTO> vehicles)
         {
             var builder = new StringBuilder();
@@ -281,6 +343,9 @@ namespace OOP_Cource.View.Controls
             return builder.ToString();
         }
 
+        /// <summary>
+        /// Формирует CSV-строку по списку транспортных средств
+        /// </summary>
         private string CreateCsv(List<VehicleDTO> vehicles)
         {
             var builder = new StringBuilder();
@@ -300,6 +365,9 @@ namespace OOP_Cource.View.Controls
             return builder.ToString();
         }
 
+        /// <summary>
+        /// Экранирует строку для корректной записи в CSV-формат
+        /// </summary>
         private static string EscapeCsv(string value)
         {
             if (value == null)
