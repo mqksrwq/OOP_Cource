@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Bundle Name="OOP Autopark Setup"
+          Version="1.0.0.0"
+          Manufacturer="Student"
+          UpgradeCode="{3FF4D65D-246E-4C4C-8131-1A7299429733}">
+
+    <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense"/>
+
+    <Chain>
+      <MsiPackage SourceFile="Product.msi" DisplayInternalUI="yes" Compressed="yes"/>
+    </Chain>
+  </Bundle>
+</Wix>
