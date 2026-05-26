@@ -362,3 +362,11 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /.github
+.claude/
+.idea/
+
+# Exclude Setup installer output from ignoring
+!Setup/Release/
+!Setup/Release/**
+!Setup/Debug/
+!Setup/Debug/**

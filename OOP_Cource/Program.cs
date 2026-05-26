@@ -1,24 +1,25 @@
 using System.Windows.Forms;
-using OOP_Cource.Forms;
-using System;
 
-namespace OOP_Cource
+namespace KursProject_Boyarkin_OOP
 {
     /// <summary>
-    /// Точка входа в приложение
+    /// Точка входа приложения «Автобусный парк».
+    /// Содержит метод <see cref="Main"/>, который инициализирует WinForms-среду и запускает приложение.
     /// </summary>
     internal static class Program
     {
         /// <summary>
-        /// Главный метод — запускает приложение с формой администратора
+        /// Главный метод приложения. Настраивает режим DPI, включает визуальные стили
+        /// и открывает экран-заставку <see cref="StartForm"/>.
         /// </summary>
-        [STAThread]
+        [System.STAThread]
         static void Main()
         {
-            Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
+            // Поддержка высокого DPI — масштабирование через системные настройки Windows
+            Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new AdminForm());
+            Application.Run(new StartForm());
         }
     }
 }
